@@ -3,17 +3,32 @@ import { Router } from '@reach/router'
 import PrivateRoute from './wrappers/PrivateRoute'
 import Layout from './wrappers/Layout'
 import Gifs from './components/Gifs'
+import CreateGifs from './components/CreateGifs'
+import NotFound from '../pages/404'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
+import { ThemeProvider } from '@material-ui/styles'
+import { Provider as ReduxProvider } from 'react-redux'
+import store from './redux/root.store'
+
+const theme = createMuiTheme({
+    palette: {
+        type: 'dark',
+    },
+})
 
 const App = () => {
     return (
-        <Layout>
-            <Router>
-                <PrivateRoute path="/app">
-                    <PrivateRoute exact path="/my" component={Gifs} />
-                    <PrivateRoute exact path="/" default={true} component={Gifs} />
-                </PrivateRoute>
-            </Router>
-        </Layout>
+        <ReduxProvider store={store}>
+            <ThemeProvider theme={theme}>
+                <Layout>
+                    <Router>
+                        <PrivateRoute path="/app" component={Gifs} />
+                        <PrivateRoute path="/app/create" component={CreateGifs} />
+                        <PrivateRoute path="/" default={true} component={NotFound} />
+                    </Router>
+                </Layout>
+            </ThemeProvider>
+        </ReduxProvider>
     )
 }
 function PublicRoute(props) {

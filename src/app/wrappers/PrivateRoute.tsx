@@ -2,13 +2,24 @@ import React from 'react'
 import { checkIsSignedIn } from '../services/auth'
 import { navigate } from 'gatsby'
 
-class PrivateRoute extends React.Component {
-    state = { checking: true, signedIn: false }
+type Props = {
+    component: any
+    exact?: boolean
+    location?: any
+    path: string
+    default?: boolean
+}
 
-    componentDidMount = () => {
-        const { location } = this.props
+function PrivateRoute(props: Props) {
+    const [checking, setChecking] = React.useState(false)
+    const [signedIn, setSignedIn] = React.useState(false)
+
+    const { location } = props
+    const Component = props.component
+
+    React.useEffect(() => {
         checkIsSignedIn().then(signedIn => {
-            if (location.pathname !== `/app/login`) {
+            if (location.pathname !== `/`) {
                 if (!signedIn) {
                     // If the user is not logged in, redirect to the login page.
                     navigate(`/`)
@@ -19,18 +30,15 @@ class PrivateRoute extends React.Component {
                     }
                 }
             }
-            this.setState({ checking: false, signedIn })
+            setSignedIn(signedIn)
+            setChecking(false)
         })
-    }
+    }, [location.pathname, location.search])
 
-    render() {
-        const { component: Component, location, ...rest } = this.props
-        const { checking, signedIn } = this.state
-        if (checking) {
-            return <>...</>
-        } else {
-            return signedIn ? <Component {...rest} /> : null
-        }
+    if (checking) {
+        return <>...</>
+    } else {
+        return signedIn ? <Component {...props} /> : null
     }
 }
 
