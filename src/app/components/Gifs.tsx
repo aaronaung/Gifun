@@ -1,15 +1,27 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { getUser } from '../services/auth'
+import { getUserGifs } from '../services/gif.service'
+import GifsGrid from './GifsGrid'
+import { useDispatch, useSelector } from 'react-redux'
+import { addGifs } from '../redux/gifs/gifs.action'
+import { gifsSelector } from '../redux/gifs/gifs.selector'
 
 const Gifs = () => {
-    React.useEffect(() => {
-        console.log('GIFS COMPONENT LOADED')
+    const { identityAddress: userId } = getUser()
+    const dispatch = useDispatch()
+    const gifs = useSelector(state => gifsSelector(state))
+    console.log(gifs)
 
-        return () => {
-            'GIFS COMPONENT TORN DOWN'
-        }
+    const fetchUserGifs = async () => {
+        let gifs = await getUserGifs(userId)
+        dispatch(addGifs(gifs))
+    }
+
+    useEffect(() => {
+        fetchUserGifs()
     }, [])
 
-    return <h1>GIFS COMPONENT</h1>
+    return <GifsGrid gifs={gifs} />
 }
 
 export default Gifs

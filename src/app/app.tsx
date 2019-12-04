@@ -9,6 +9,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import { ThemeProvider } from '@material-ui/styles'
 import { Provider as ReduxProvider } from 'react-redux'
 import store from './redux/root.store'
+import { CameraProvider } from './contexts/CameraContext.tsx'
 
 const theme = createMuiTheme({
     palette: {
@@ -20,13 +21,15 @@ const App = () => {
     return (
         <ReduxProvider store={store}>
             <ThemeProvider theme={theme}>
-                <Layout>
-                    <Router>
-                        <PrivateRoute path="/app" component={Gifs} />
-                        <PrivateRoute path="/app/create" component={CreateGifs} />
-                        <PrivateRoute path="/" default={true} component={NotFound} />
-                    </Router>
-                </Layout>
+                <CameraProvider>
+                    <Layout>
+                        <Router>
+                            <PrivateRoute path="/app" component={Gifs} />
+                            <PrivateRoute path="/app/create" component={CreateGifs} />
+                            <PrivateRoute path="/" default={true} component={NotFound} />
+                        </Router>
+                    </Layout>
+                </CameraProvider>
             </ThemeProvider>
         </ReduxProvider>
     )

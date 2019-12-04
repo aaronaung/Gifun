@@ -18,6 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import AddBoxIcon from '@material-ui/icons/AddBox'
 import MailIcon from '@material-ui/icons/Mail'
 import GifIcon from '@material-ui/icons/Gif'
+import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
 import { navigate } from 'gatsby'
 
 const drawerWidth = 240
@@ -125,7 +126,7 @@ export default function MiniDrawer({ children }) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap>
-                        Welcome to Gifuru
+                        Welcome to GIFuru
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -152,7 +153,7 @@ export default function MiniDrawer({ children }) {
                 <List>
                     <ListItem button key={'My Gifs'} onClick={() => navigate('/app')}>
                         <ListItemIcon>
-                            <GifIcon />
+                            <FavoriteIcon />
                         </ListItemIcon>
                         <ListItemText primary="My Gifs" />
                     </ListItem>

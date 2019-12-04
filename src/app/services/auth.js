@@ -1,4 +1,5 @@
 import { UserSession, AppConfig } from 'blockstack'
+import { configure, User } from 'radiks/src'
 
 // helpful for debugging
 const logAuth = process.env.NODE_ENV === 'development' && true // set to true to turn on logging
@@ -6,12 +7,18 @@ const clog = (...args) => logAuth && console.log(...args)
 // helpful for debugging
 
 const appConfig = new AppConfig(
-    ['store_write'],
+    ['store_write', 'publish_data'],
     typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000',
     '/app',
     '/manifest.webmanifest'
 )
+
 const userSession = new UserSession({ appConfig })
+
+configure({
+    apiServer: process.env.GATSBY_RADIKS_SERVER_URL || 'http://localhost:3000',
+    userSession,
+})
 
 export const isBrowser = () => typeof window !== 'undefined'
 
@@ -23,7 +30,8 @@ export const handleLogin = callback => {
         clog('logged in')
         callback(getUser())
     } else if (userSession.isSignInPending()) {
-        userSession.handlePendingSignIn().then(userData => {
+        userSession.handlePendingSignIn().then(async userData => {
+            await User.createWithCurrentUser()
             callback(userData)
         })
     } else {
