@@ -1,7 +1,16 @@
 import { UPDATE_FORM_VALUES, SET_FORM_ERRORS } from './form.action'
 
 const INITIAL_STATE = {
-    formValues: { textBaseline: 'top', gifHeight: 200, gifWidth: 200 },
+    formValues: {
+        textBaseline: 'bottom',
+        gifHeight: 300,
+        gifWidth: 300,
+        fontSize: 20,
+        fontColor: '#ffffff',
+        text: 'Hello World',
+        fontFamily: 'Arial',
+        fontWeight: 'normal',
+    },
     formErrors: {},
 }
 

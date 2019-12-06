@@ -84,7 +84,8 @@ const useStyles = makeStyles((theme: Theme) =>
         content: {
             flexGrow: 1,
             padding: theme.spacing(3),
-            height: '100vh',
+            height: 'fit-content',
+            minHeight: '100vh',
             backgroundColor: '#1f1f1f',
             color: 'white',
         },

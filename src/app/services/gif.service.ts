@@ -11,9 +11,23 @@ const GIFS_PATH = 'gifs'
  * /gifs/{id} - {b64, id, createdAt, properties}
  */
 
+const _massageGIFProps = props => {
+    let newProps = { ...props }
+    if (newProps.textBaseline === 'custom') {
+        delete newProps.textBaseline
+        newProps.textXCoordinate = parseInt(newProps.textXCoordinate)
+        newProps.textYCoordinate = parseInt(newProps.textYCoordinate)
+    } else {
+        delete newProps.textXCoordinate
+        delete newProps.textYCoordinate
+    }
+    newProps = { ...newProps, fontSize: `${props.fontSize || 20}px`, numFrames: 15, sampleInterval: 8 }
+    return newProps
+}
+
 export const generateGif = (props: GIFPropertiesInterface) => {
+    let newProps = _massageGIFProps(props)
     return new Promise((resolve, reject) => {
-        let newProps = { ...props, fontSize: `${props.fontSize}px`, numFrames: 20 }
         gifShot.createGIF(newProps, obj => {
             if (!obj.error) {
                 resolve(obj.image)
