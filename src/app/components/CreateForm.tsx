@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import {
     TextField,
     makeStyles,
@@ -20,7 +20,7 @@ import { newPreview, pendingPreview } from '../redux/preview/preview.action'
 import { generateGif } from '../services/gif.service'
 import { previewSelector } from '../redux/preview/preview.selector'
 import { formSelector } from '../redux/form/form.selector'
-import { updateFormValues, updateFormErrors, setFormErrors } from '../redux/form/form.action'
+import { updateFormValues, updateFormErrors, setFormErrors, resetForm } from '../redux/form/form.action'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -107,6 +107,10 @@ const CreateForm = () => {
     const { pending } = useSelector(state => previewSelector(state))
     const { formValues, formErrors } = useSelector(state => formSelector(state))
 
+    useEffect(() => {
+        return () => dispatch(resetForm())
+    }, [])
+
     const onInputChange = (e, key) => {
         let inputValue = e.target.value
         dispatch(updateFormValues({ [key]: e.target.value }))
@@ -177,7 +181,7 @@ const CreateForm = () => {
                             className: classes.menu,
                         },
                     }}
-                    defaultValue="bottom"
+                    defaultValue="custom"
                     onChange={e => {
                         onInputChange(e, 'textBaseline')
                         if (e.target.value !== 'custom') {

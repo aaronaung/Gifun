@@ -1,8 +1,10 @@
-import { UPDATE_FORM_VALUES, SET_FORM_ERRORS } from './form.action'
+import { UPDATE_FORM_VALUES, SET_FORM_ERRORS, RESET_FORM } from './form.action'
 
 const INITIAL_STATE = {
     formValues: {
-        textBaseline: 'bottom',
+        textBaseline: 'custom',
+        textXCoordinate: 150,
+        textXCoordinate: 150,
         gifHeight: 300,
         gifWidth: 300,
         fontSize: 20,
@@ -26,6 +28,8 @@ const FormReducer = (state = INITIAL_STATE, action) => {
                 formValues: state.formValues,
                 formErrors: action.payload,
             }
+        case RESET_FORM:
+            return INITIAL_STATE
         default:
             return {
                 ...state,
