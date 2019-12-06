@@ -81,11 +81,11 @@ const CreateGifs = () => {
                 </Tabs>
                 <TabPanel value={tabValue} index={0}>
                     <Grid container>
-                        <Grid item xs={12} md={6} lg={6} style={{ marginBottom: '25px' }}>
+                        <Grid item xs={12} md={6} lg={7} style={{ marginBottom: '25px' }}>
                             <CreateForm />
                         </Grid>
 
-                        <Grid item xs={12} md={6} lg={6} style={{ paddingLeft: '16px' }}>
+                        <Grid item xs={12} md={6} lg={5} style={{ paddingLeft: '16px' }}>
                             <PreviewGif />
                         </Grid>
                     </Grid>
