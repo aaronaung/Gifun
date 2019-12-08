@@ -9,19 +9,21 @@ import { gifsSelector } from '../redux/gifs/gifs.selector'
 const Gifs = () => {
     const { identityAddress: userId } = getUser()
     const dispatch = useDispatch()
-    const gifs = useSelector(state => gifsSelector(state))
-    console.log(gifs)
 
     const fetchUserGifs = async () => {
-        let gifs = await getUserGifs(userId)
-        dispatch(addGifs(gifs))
+        let resp = await getUserGifs(userId)
+        resp.$getGifs.subscribe({
+            next: gif => {
+                dispatch(addGifs([gif]))
+            },
+        })
     }
 
     useEffect(() => {
         fetchUserGifs()
     }, [])
 
-    return <GifsGrid gifs={gifs} />
+    return <GifsGrid />
 }
 
 export default Gifs

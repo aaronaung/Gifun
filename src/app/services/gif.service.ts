@@ -1,8 +1,11 @@
 import gifShot from 'gifShot'
-import { GIFPropertiesInterface, GIFsObjectInterface } from '../interfaces/Gifs.interface'
+import { GetAllGifsResponseInterface, GifInterface } from '../interfaces/Gifs.interface'
 import { putFile, getFile, deleteFile } from 'blockstack'
 import { v4 as uuid } from 'uuid'
 import { error } from '../utils/response'
+import { of } from 'rxjs'
+import { mergeAll, map } from 'rxjs/operators'
+
 const USER_PATH = 'users'
 const GIFS_PATH = 'gifs'
 
@@ -25,7 +28,7 @@ const _massageGIFProps = props => {
     return newProps
 }
 
-export const generateGif = (props: GIFPropertiesInterface) => {
+export const generateGif = props => {
     let newProps = _massageGIFProps(props)
     return new Promise((resolve, reject) => {
         gifShot.createGIF(newProps, obj => {
@@ -39,12 +42,11 @@ export const generateGif = (props: GIFPropertiesInterface) => {
 }
 
 export const getUserGIFIds = async (userId: any): [string] => {
-    let allGifs
-    allGifs = await getFile(`${USER_PATH}/${userId}/gifs`)
-    return JSON.parse(allGifs || '[]')
+    let allGifIdss = await getFile(`${USER_PATH}/${userId}/gifs`)
+    return JSON.parse(allGifIdss || '[]')
 }
 
-export const uploadGifForUser = async (props: GIFPropertiesInterface, b64: string, userId: any): Promise<GIFsObjectInterface> => {
+export const uploadGifForUser = async (props, b64: string, userId: any): Promise<GifInterface> => {
     try {
         let userGifs = await getUserGIFIds(userId)
         let gifId = uuid()
@@ -60,8 +62,8 @@ export const uploadGifForUser = async (props: GIFPropertiesInterface, b64: strin
     }
 }
 
-export const getUserGifs = async (userId: any): Promise<GIFsObjectInterface> => {
-    let gifIds = await getFile(`${USER_PATH}/${userId}/gifs`)
+export const getUserGifs = async (userId: any): GetAllGifsResponseInterface => {
+    let gifIds = JSON.parse(await getFile(`${USER_PATH}/${userId}/gifs`))
     if (!gifIds) {
         return []
     } else {
@@ -76,17 +78,24 @@ export const getUserGifs = async (userId: any): Promise<GIFsObjectInterface> => 
                 }
             })
         }
-        gifIds = JSON.parse(gifIds)
-        let getB64s = Promise.all(gifIds.map(id => mapIdToGetCalls(id, getFile(`${GIFS_PATH}/${id}/b64`))))
-        let getProps = Promise.all(gifIds.map(id => mapIdToGetCalls(id, getFile(`${GIFS_PATH}/${id}`))))
-        let [b64s, props] = await Promise.all([getB64s, getProps])
-        let gifs = {}
-        b64s.forEach(b64 => {
-            gifs[b64['id']] = gifs[b64['id']] ? { ...gifs[b64['id']], b64: b64.data } : { b64: b64.data }
+        const combinePropsAndB64 = (id, getB64, getProps) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    let props = JSON.parse(await getProps)
+                    let b64 = await getB64
+                    resolve({ id, ...props, b64 })
+                } catch (error) {
+                    reject({ id, error })
+                }
+            })
+        }
+        let getGifs = gifIds.map(id => {
+            let getProps = getFile(`${GIFS_PATH}/${id}`)
+            let getB64 = getFile(`${GIFS_PATH}/${id}/b64`)
+            return combinePropsAndB64(id, getB64, getProps)
         })
-        props.forEach(prop => {
-            gifs[prop['id']] = gifs[prop['id']] ? { ...gifs[prop['id']], ...JSON.parse(prop.data) } : { ...JSON.parse(prop.data) }
-        })
-        return gifs
+
+        let $getGifs = of.apply(this, getGifs).pipe(mergeAll())
+        return { gifIds, $getGifs }
     }
 }

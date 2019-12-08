@@ -1,9 +1,9 @@
-import { GIFsObjectInterface } from '../../interfaces/Gifs.interface'
+import { GifInterface } from '../../interfaces/Gifs.interface'
 
 export const ADD_GIFS = 'ADD_GIFS'
 export const REMOVE_GIFS = 'REMOVE_GIFS'
 
-export const addGifs = (gifs: GIFsObjectInterface) => {
+export const addGifs = (gifs: [GifInterface]) => {
     return { type: ADD_GIFS, payload: gifs }
 }
 

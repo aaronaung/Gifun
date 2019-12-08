@@ -182,8 +182,9 @@ function PreviewGuideDialog(props) {
             <DialogTitle id="dialog">Note</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    The camera dimensions are auto-adjusted to keep the aspect ratio and achieve the best quality GIF: the width
-                    and height inputs may not exactly define the preview dimensions.
+                    The camera dimensions are auto-adjusted to keep the aspect ratio and achieve the best quality GIF. The width
+                    and height inputs may/may not exactly define the preview dimensions; nevertheless, we've employed the best
+                    possible calculations to keep the dimensions closest to the inputs.
                 </DialogContentText>
                 {/* <Divider></Divider> */}
                 <DialogContentText id="alert-dialog-description">
@@ -283,7 +284,7 @@ const PreviewGif = () => {
     }, [formValues])
 
     return (
-        <div>
+        <div style={{ marginLeft: '16px' }}>
             <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
                 Preview
             </Typography>
@@ -293,11 +294,13 @@ const PreviewGif = () => {
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}
                         label={<Typography color="textSecondary">Show text placement</Typography>}
                     ></FormControlLabel>
-                    <InfoIcon
-                        color="disabled"
-                        onClick={() => setOpenDialog(true)}
-                        style={{ marginLeft: 'auto', cursor: 'pointer' }}
-                    ></InfoIcon>
+                    <Tooltip title="Important Note">
+                        <InfoIcon
+                            color="disabled"
+                            onClick={() => setOpenDialog(true)}
+                            style={{ marginLeft: 'auto', cursor: 'pointer' }}
+                        ></InfoIcon>
+                    </Tooltip>
                     <PreviewGuideDialog
                         open={openDialog}
                         setOpen={setOpenDialog}

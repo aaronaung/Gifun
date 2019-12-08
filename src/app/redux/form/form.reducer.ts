@@ -4,7 +4,7 @@ const INITIAL_STATE = {
     formValues: {
         textBaseline: 'custom',
         textXCoordinate: 150,
-        textXCoordinate: 150,
+        textYCoordinate: 150,
         gifHeight: 300,
         gifWidth: 300,
         fontSize: 20,
