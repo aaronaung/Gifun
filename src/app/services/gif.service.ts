@@ -99,8 +99,19 @@ export const getUserGifs = async (userId: any): GetAllGifsResponseInterface => {
     }
 }
 
-export const deleteUserGifs = async (ids, userId) => {
-    let gifIds = JSON.parse(await getFile(`${USER_PATH}/${userId}/gifs`))
-    let newGifIds = _.xor(gifIds, ids)
+export const deleteUserGifs = async (ids, userId): [string] => {
+    try {
+        let gifIds = JSON.parse(await getFile(`${USER_PATH}/${userId}/gifs`))
+        let newGifIds = _.xor(gifIds, ids)
+        let updateUserGifs = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(newGifIds))
+        let deleteGifProps = ids.map(id => deleteFile(`${GIFS_PATH}/${id}`))
+        let deleteGifB64s = ids.map(id => deleteFile(`${GIFS_PATH}/${id}/b64`))
+
+        await Promise.all([...deleteGifB64s, ...deleteGifProps, updateUserGifs])
+        return ids
+    } catch (err) {
+        return error(err.message)
+    }
+
     console.log(gifIds, newGifIds)
 }

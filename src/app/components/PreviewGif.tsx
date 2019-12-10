@@ -77,9 +77,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderStyle: 'dashed',
         background: '#272727',
         display: 'flex',
+        position: 'absolute',
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'absolute',
+        flexWrap: 'wrap',
     },
     counterOverlay: {
         display: 'flex',
@@ -117,7 +118,6 @@ function MediaCard({ gifProperties, gifB64 }) {
 
     const handleRemovePreview = useCallback(() => {
         setCameraState({ on: false, loading: true })
-
         dispatch(removePreview())
     })
 
@@ -291,7 +291,7 @@ const PreviewGif = () => {
             <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
                 Preview
             </Typography>
-            {cameraState.on && !b64 ? (
+            {!b64 ? (
                 <div className={classes.topBar} style={{ width: previewSize.width }}>
                     <FormControlLabel
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}
@@ -314,8 +314,7 @@ const PreviewGif = () => {
                 ''
             )}
 
-            {cameraState.loading ? <Loading width={previewSize.width} height={previewSize.height} /> : ''}
-            <div style={{ display: 'flex' }}>
+            <div style={{ width: 'fit-content' }}>
                 {!previewState.processing && !b64 && cameraState.on && showText && Object.keys(formErrors).length === 0 ? (
                     <div
                         className={classes.textPlacementOverlay}
@@ -335,7 +334,11 @@ const PreviewGif = () => {
                 ) : (
                     ''
                 )}
-                {previewState.processing ? <Loading width={previewSize.width} height={previewSize.height} /> : ''}
+                {previewState.processing || cameraState.loading ? (
+                    <Loading width={previewSize.width} height={previewSize.height} />
+                ) : (
+                    ''
+                )}
                 {b64 && !pending ? (
                     <div className={classes.videoContainer}>
                         <MediaCard gifProperties={properties} gifB64={b64} />

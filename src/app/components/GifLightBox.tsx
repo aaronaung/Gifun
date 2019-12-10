@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
@@ -15,9 +15,10 @@ import DownloadIcon from '@material-ui/icons/CloudDownloadTwoTone'
 import DeleteIcon from '@material-ui/icons/DeleteTwoTone'
 import Slide from '@material-ui/core/Slide'
 import { TransitionProps } from '@material-ui/core/transitions'
-import { Tooltip } from '@material-ui/core'
+import { Tooltip, CircularProgress } from '@material-ui/core'
 import { deleteUserGifs } from '../services/gif.service'
 import { getUser } from '../services/auth'
+import * as _ from 'lodash'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,9 +41,14 @@ const useStyles = makeStyles((theme: Theme) =>
             background: theme.palette.grey[900],
         },
         actionBtn: {
-            marginLeft: 30,
             fontSize: 30,
             cursor: 'pointer',
+        },
+        deleting: {
+            opacity: 0.3,
+        },
+        loadingIcon: {
+            position: 'absolute',
         },
     })
 )
@@ -51,16 +57,32 @@ const Transition = React.forwardRef<unknown, TransitionProps>(function Transitio
     return <Slide direction="up" ref={ref} {...props} />
 })
 
-export default function GifLightBox({ gif, open, setOpen }) {
+export default function GifLightBox({ gif, open, setOpen, setGifs }) {
     const classes = useStyles()
     const { identityAddress: userId } = getUser()
+    const [deleting, setDeleting] = useState(false)
 
     const handleClose = () => {
         setOpen(false)
     }
 
-    const handleDelete = () => {
-        deleteUserGifs([gif && gif.id], userId)
+    const handleDelete = async () => {
+        if (gif) {
+            setDeleting(true)
+            let deletedIds = await deleteUserGifs([gif.id], userId)
+            let gifDate = new Date(gif.createdAt).toDateString()
+            setGifs(state => {
+                let newState = { ...state }
+
+                delete newState[gifDate][gif.id]
+                if (_.isEmpty(newState[gifDate])) {
+                    delete newState[gifDate]
+                }
+                return newState
+            })
+            setDeleting(false)
+            setOpen(false)
+        }
     }
 
     return (
@@ -80,24 +102,27 @@ export default function GifLightBox({ gif, open, setOpen }) {
                                 href={(gif && gif.b64) || ''}
                                 style={{ textDecoration: 'none' }}
                             >
-                                <DownloadIcon
-                                    style={{ color: '#66bb6a' }}
-                                    className={classes.actionBtn}
-                                    fontSize="default"
-                                ></DownloadIcon>
+                                <Button className={classes.actionBtn}>
+                                    <DownloadIcon style={{ color: '#66bb6a' }} fontSize="large"></DownloadIcon>
+                                </Button>
                             </a>
                         </Tooltip>
                         <Tooltip title={<Typography variant="subtitle2">Delete</Typography>}>
-                            <DeleteIcon
-                                style={{ color: '#d32f2f' }}
-                                className={classes.actionBtn}
-                                fontSize="default"
-                                onClick={handleDelete}
-                            ></DeleteIcon>
+                            <Button onClick={handleDelete} className={classes.actionBtn} disabled={deleting}>
+                                <DeleteIcon style={{ color: `${!deleting ? '#d32f2f' : 'grey'}` }} fontSize="large"></DeleteIcon>
+                            </Button>
                         </Tooltip>
                     </Toolbar>
                 </AppBar>
-                <div className={classes.gifContainer}>{gif ? <img src={gif.b64} className={classes.gif} alt="" /> : ''}</div>
+
+                {gif ? (
+                    <div className={classes.gifContainer}>
+                        {deleting ? <CircularProgress className={classes.loadingIcon}></CircularProgress> : ''}
+                        <img src={gif.b64} className={classes.gif} className={deleting ? classes.deleting : ''} alt="" />
+                    </div>
+                ) : (
+                    ''
+                )}
             </Dialog>
         </div>
     )

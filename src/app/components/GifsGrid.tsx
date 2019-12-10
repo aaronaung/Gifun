@@ -30,14 +30,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }))
 
-export default function GifsGrid({ datedGifs }) {
+export default function GifsGrid({ datedGifs, setDatedGifs }) {
     const classes = useStyles()
     const [openLightBox, setOpenLightBox] = useState(false)
     const [lightBoxGif, setLightBoxGif] = useState(null)
 
     return (
         <div>
-            <GifLightBox open={openLightBox} setOpen={setOpenLightBox} gif={lightBoxGif}></GifLightBox>
+            <GifLightBox open={openLightBox} setOpen={setOpenLightBox} gif={lightBoxGif} setGifs={setDatedGifs}></GifLightBox>
             {Object.keys(datedGifs)
                 .map(dateString => new Date(dateString))
                 .sort(compareDesc)

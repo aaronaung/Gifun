@@ -10,7 +10,6 @@ const Gifs = () => {
     const { identityAddress: userId } = getUser()
     const dispatch = useDispatch()
     const gifs = useSelector(state => gifsSelector(state))
-    const [skeletonNum, setSkeletonNum] = useState(0)
     const [datedGifs, setDatedGifs] = useState({}) /** sorted by date */
 
     const mapGifToDate = gif => {}
@@ -19,7 +18,6 @@ const Gifs = () => {
         let resp = await getUserGifs(userId)
         let gifIds = resp.gifIds
         let gifProps = resp.gifProps
-        setSkeletonNum(gifIds.length)
         for (let i = 0; i < gifProps.length; i++) {
             /** Set up gif skeletons (without b64) */
             let gif = gifProps[i]
@@ -38,7 +36,6 @@ const Gifs = () => {
 
         resp.$getGifs.subscribe({
             next: gif => {
-                setSkeletonNum(state => state - 1)
                 if (gif.createdAt) {
                     /** Back fill b64s in the dated Gifs map */
                     let dateString = new Date(gif.createdAt).toDateString()
@@ -59,7 +56,7 @@ const Gifs = () => {
         fetchUserGifs()
     }, [])
 
-    return <GifsGrid skeletonNum={skeletonNum} datedGifs={datedGifs} />
+    return <GifsGrid datedGifs={datedGifs} setDatedGifs={setDatedGifs} />
 }
 
 export default Gifs

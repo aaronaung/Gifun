@@ -80,8 +80,8 @@ const CreateGifs = () => {
                     <Tab label="Video" {...a11yProps(1)} />
                 </Tabs>
                 <TabPanel value={tabValue} index={0}>
-                    <Grid container>
-                        <Grid item xs={12} md={8} lg={8} style={{ marginBottom: '25px' }}>
+                    <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
+                        <Grid item xs={12} md={7} lg={7} style={{ marginBottom: '25px' }}>
                             <CreateForm />
                         </Grid>
 
