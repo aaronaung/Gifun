@@ -111,12 +111,13 @@ function MediaCard({ gifProperties, gifB64 }) {
     const handleSavePreview = useCallback(async () => {
         setSaving(true)
         let resp = await uploadGifForUser(gifProperties, gifB64, userId)
-        dispatch(addGifs(resp))
+        dispatch(addGifs([resp]))
         setSaving(false)
     }, [])
 
     const handleRemovePreview = useCallback(() => {
         setCameraState({ on: false, loading: true })
+
         dispatch(removePreview())
     })
 
@@ -136,15 +137,17 @@ function MediaCard({ gifProperties, gifB64 }) {
                 </Tooltip>
 
                 <Tooltip title={<Typography variant="subtitle2">Save</Typography>}>
-                    <Button
-                        disabled={saving}
-                        size="medium"
-                        style={{ color: '#ec407a' }}
-                        onClick={handleSavePreview}
-                        className={classes.actionBtns}
-                    >
-                        <FavoriteTwoTone fontSize="default" />
-                    </Button>
+                    <span>
+                        <Button
+                            disabled={saving}
+                            size="medium"
+                            style={{ color: '#ec407a' }}
+                            onClick={handleSavePreview}
+                            className={classes.actionBtns}
+                        >
+                            <FavoriteTwoTone color={saving ? 'disabled' : 'inherit'} fontSize="default" />
+                        </Button>
+                    </span>
                 </Tooltip>
 
                 <Tooltip title={<Typography variant="subtitle2">Cancel</Typography>}>
@@ -173,9 +176,8 @@ const Loading = ({ width, height }) => {
     )
 }
 
-function PreviewGuideDialog(props) {
+function PreviewGuideDialog({ open, setOpen }) {
     const classes = useStyles()
-    const { open, setOpen } = props
 
     return (
         <Dialog aria-labelledby="dialog" open={open} onBackdropClick={() => setOpen(false)}>
@@ -221,6 +223,7 @@ const PreviewGif = () => {
 
     const textPreviewStyling = useCallback(() => {
         let baseFontStyle = {
+            color: formValues.fontColor,
             fontFamily: formValues.fontFamily,
             fontWeight: formValues.fontWeight,
             fontSize: `${formValues.fontSize}px`,
@@ -288,7 +291,7 @@ const PreviewGif = () => {
             <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
                 Preview
             </Typography>
-            {!cameraState.loading && !b64 ? (
+            {cameraState.on && !b64 ? (
                 <div className={classes.topBar} style={{ width: previewSize.width }}>
                     <FormControlLabel
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}
@@ -334,7 +337,9 @@ const PreviewGif = () => {
                 )}
                 {previewState.processing ? <Loading width={previewSize.width} height={previewSize.height} /> : ''}
                 {b64 && !pending ? (
-                    <MediaCard gifProperties={properties} gifB64={b64} />
+                    <div className={classes.videoContainer}>
+                        <MediaCard gifProperties={properties} gifB64={b64} />
+                    </div>
                 ) : (
                     <div className={classes.videoContainer}>
                         <Webcam

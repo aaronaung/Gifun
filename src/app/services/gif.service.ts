@@ -56,7 +56,7 @@ export const uploadGifForUser = async (props, b64: string, userId: any): Promise
         let uploadGifB64 = putFile(`${GIFS_PATH}/${gifId}/b64`, b64)
         let updateUserGifs = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(userGifs))
         let uploadAndUpdate = await Promise.all([uploadGif, updateUserGifs])
-        return { [gifId]: { ...props, b64 } }
+        return { id: gifId, ...props, b64 }
     } catch (err) {
         return error(err.message)
     }
@@ -68,34 +68,39 @@ export const getUserGifs = async (userId: any): GetAllGifsResponseInterface => {
         return []
     } else {
         /** @return a promise that awaits a get, and resolves with id mapping to the data if successful */
-        const mapIdToGetCalls = (id, get) => {
+        const mapPropsToB64 = (props, getB64) => {
             return new Promise(async (resolve, reject) => {
                 try {
-                    let data = await get
-                    resolve({ id, data })
+                    let b64 = await getB64
+                    resolve({ ...props, b64 })
                 } catch (error) {
                     reject({ id, error })
                 }
             })
         }
-        const combinePropsAndB64 = (id, getB64, getProps) => {
+
+        const mapIdToProps = (id, getProps) => {
             return new Promise(async (resolve, reject) => {
                 try {
                     let props = JSON.parse(await getProps)
-                    let b64 = await getB64
-                    resolve({ id, ...props, b64 })
+                    resolve({ id, ...props })
                 } catch (error) {
                     reject({ id, error })
                 }
             })
         }
-        let getGifs = gifIds.map(id => {
-            let getProps = getFile(`${GIFS_PATH}/${id}`)
-            let getB64 = getFile(`${GIFS_PATH}/${id}/b64`)
-            return combinePropsAndB64(id, getB64, getProps)
-        })
 
+        let getGifProps = gifIds.map(id => mapIdToProps(id, getFile(`${GIFS_PATH}/${id}`)))
+        let gifProps = await Promise.all(getGifProps)
+
+        let getGifs = gifProps.map(props => mapPropsToB64(props, getFile(`${GIFS_PATH}/${props.id}/b64`)))
         let $getGifs = of.apply(this, getGifs).pipe(mergeAll())
-        return { gifIds, $getGifs }
+        return { gifIds, gifProps, $getGifs }
     }
+}
+
+export const deleteUserGifs = async (ids, userId) => {
+    let gifIds = JSON.parse(await getFile(`${USER_PATH}/${userId}/gifs`))
+    let newGifIds = _.xor(gifIds, ids)
+    console.log(gifIds, newGifIds)
 }

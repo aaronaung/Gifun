@@ -11,6 +11,7 @@
     "@types/lodash": "^4.14.149",
     "@types/react-redux": "^7.1.5",
     "blockstack": "^19.1.0",
+    "date-fns": "^2.8.1",
     "gatsby": "^2.18.4",
     "gatsby-image": "^2.0.20",
     "gatsby-plugin-create-client-paths": "^2.0.2",

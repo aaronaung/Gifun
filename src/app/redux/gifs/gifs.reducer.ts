@@ -9,7 +9,9 @@ const GifsReducer = (state = INITIAL_STATE, action) => {
             return [...state, ...action.payload]
         case REMOVE_GIFS:
             let newState = [...state]
+            console.log(action)
             _.remove(newState, gif => _.includes(action.payload, gif.id))
+            console.log('new state:', newState)
             return newState
         default:
             return state

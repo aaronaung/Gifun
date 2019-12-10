@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs'
+
 export interface GifInterface {
     width: number
     height: number
@@ -9,10 +11,12 @@ export interface GifInterface {
     textBaseline?: string
     textXCoordinate?: string
     textYCoordinate?: string
-    b64: string
+    createdAt: number
+    b64?: string
     id: string
 }
 export interface GetAllGifsResponseInterface {
     gifIds: [string]
+    gifProps: [GifInterface]
     $getGifs: Observable<GifInterface>
 }
