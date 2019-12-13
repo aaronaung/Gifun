@@ -7,10 +7,15 @@ import IconButton from '@material-ui/core/IconButton'
 import StarBorderIcon from '@material-ui/icons/StarBorder'
 import { useSelector } from 'react-redux'
 import { gifsSelector } from '../redux/gifs/gifs.selector'
-import { Grid } from '@material-ui/core'
+import { Grid, Typography, Button, Tooltip, CircularProgress } from '@material-ui/core'
 import { Skeleton } from '@material-ui/lab'
 import { format, isToday, compareDesc, parseISO } from 'date-fns'
 import GifLightBox from './GifLightBox'
+import ihavenothing from '../../images/ihavenothing.gif'
+import dontworry from '../../images/dontworry.gif'
+import getstarted from '../../images/getstarted.gif'
+import clickme from '../../images/clickme.gif'
+import { navigate } from 'gatsby'
 
 const GRIDITEM_SIZE = { width: 250, height: 250 }
 
@@ -28,9 +33,44 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexWrap: 'wrap',
     },
+    centerItems: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%)',
+        textAlign: 'center',
+    },
+    funnyGif: {
+        height: '200px',
+        width: 'auto',
+    },
 }))
 
-export default function GifsGrid({ datedGifs, setDatedGifs }) {
+function NoGif() {
+    const classes = useStyles()
+    return (
+        <div className={classes.centerItems}>
+            {/* <Typography variant="subtitle">
+                
+            </Typography> */}
+            <div style={{ display: 'flex' }}>
+                <img className={classes.funnyGif} src={ihavenothing} alt="" />
+                <img className={classes.funnyGif} src={dontworry} alt="" />
+                <Tooltip title={<Typography variant="subtitle2">Click here to start</Typography>}>
+                    <img
+                        onClick={() => navigate('/app/create')}
+                        className={classes.funnyGif}
+                        style={{ cursor: 'pointer' }}
+                        src={clickme}
+                        alt=""
+                    />
+                </Tooltip>
+            </div>
+        </div>
+    )
+}
+
+export default function GifsGrid({ datedGifs, setDatedGifs, loading }) {
     const classes = useStyles()
     const [openLightBox, setOpenLightBox] = useState(false)
     const [lightBoxGif, setLightBoxGif] = useState(null)
@@ -38,6 +78,15 @@ export default function GifsGrid({ datedGifs, setDatedGifs }) {
     return (
         <div>
             <GifLightBox open={openLightBox} setOpen={setOpenLightBox} gif={lightBoxGif} setGifs={setDatedGifs}></GifLightBox>
+            {loading ? (
+                <div className={classes.centerItems}>
+                    <CircularProgress style={{ marginBottom: 10 }}></CircularProgress>
+                    <Typography>Loading GIFs...</Typography>
+                </div>
+            ) : (
+                ''
+            )}
+            {_.isEmpty(datedGifs) && !loading ? <NoGif></NoGif> : ''}
             {Object.keys(datedGifs)
                 .map(dateString => new Date(dateString))
                 .sort(compareDesc)

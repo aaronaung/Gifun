@@ -88,6 +88,7 @@ const useStyles = makeStyles((theme: Theme) =>
             minHeight: '100vh',
             backgroundColor: '#1f1f1f',
             color: 'white',
+            overflow: 'hidden',
         },
     })
 )

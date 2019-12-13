@@ -8,7 +8,7 @@ const clog = (...args) => logAuth && console.log(...args)
 
 const appConfig = new AppConfig(
     ['store_write', 'publish_data'],
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000',
+    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8001',
     '/app',
     '/manifest.webmanifest'
 )

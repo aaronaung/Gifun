@@ -5,6 +5,8 @@ import { v4 as uuid } from 'uuid'
 import { error } from '../utils/response'
 import { of } from 'rxjs'
 import { mergeAll, map } from 'rxjs/operators'
+import * as _ from 'lodash'
+import { gaiaPut } from './http.service'
 
 const USER_PATH = 'users'
 const GIFS_PATH = 'gifs'
@@ -13,6 +15,12 @@ const GIFS_PATH = 'gifs'
  * /user/{id}/gifs - [ gifids ]
  * /gifs/{id} - {b64, id, createdAt, properties}
  */
+
+export const getGaiaHubUrl = () => {
+    let blockStackSession = JSON.parse(localStorage.getItem('blockstack-session'))
+    let gaiaHubConfig = blockStackSession.userData.gaiaHubConfig
+    return `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}`
+}
 
 const _massageGIFProps = props => {
     let newProps = { ...props }
@@ -26,6 +34,32 @@ const _massageGIFProps = props => {
     }
     newProps = { ...newProps, fontSize: `${props.fontSize || 20}px`, numFrames: 15, sampleInterval: 8 }
     return newProps
+}
+
+const b64ToBlob = b64 => {
+    let byteString = atob(b64.split(',')[1])
+    // write the bytes of the string to an ArrayBuffer
+    let ab = new ArrayBuffer(byteString.length)
+    let ia = new Uint8Array(ab)
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i)
+    }
+
+    // write the ArrayBuffer to a blob, and you're done
+    return new Blob([ab], { type: 'image/gif' })
+}
+
+const constructHTMLSharable = (b64, imageLink) => {
+    let htmlText = `
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="Gifuru GIF"></meta>
+        <meta property="og:image" content="${imageLink}"/>
+        <meta property="og:type" content="video.other"/>
+        <meta property="og:url" content="${imageLink}"/>
+        <meta property="og:site_name" content="Gifuru"/>
+        <meta property="og:description" content="Get your personalized GIF content with Gifuru."/>
+        <img src=${b64}></img>`
+    return htmlText
 }
 
 export const generateGif = props => {
@@ -48,16 +82,23 @@ export const getUserGIFIds = async (userId: any): [string] => {
 
 export const uploadGifForUser = async (props, b64: string, userId: any): Promise<GifInterface> => {
     try {
-        let userGifs = await getUserGIFIds(userId)
         let gifId = uuid()
+        let gifBlob = b64ToBlob(b64)
+        let gaiaHubUrl = getGaiaHubUrl()
+        let htmlText = constructHTMLSharable(b64, `${gaiaHubUrl}/${GIFS_PATH}/${gifId}/blob`)
+        let userGifs = await getUserGIFIds(userId)
         userGifs.push(gifId)
-        let uploadGif = putFile(`${GIFS_PATH}/${gifId}`, JSON.stringify({ ...props, createdAt: Date.now() }))
-        /** store b64 separately to avoid json.stringify on a large string */
+
+        let uploadGifProps = putFile(`${GIFS_PATH}/${gifId}`, JSON.stringify({ ...props, createdAt: Date.now() }))
         let uploadGifB64 = putFile(`${GIFS_PATH}/${gifId}/b64`, b64)
-        let updateUserGifs = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(userGifs))
-        let uploadAndUpdate = await Promise.all([uploadGif, updateUserGifs])
+        let updateGifList = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(userGifs))
+        let uploadGifBlob = putFile(`${GIFS_PATH}/${gifId}/blob`, gifBlob, { contentType: 'image/gif', encrypt: false })
+        let uploadShareableHTML = putFile(`${GIFS_PATH}/${gifId}/shared`, htmlText, { contentType: 'text/html', encrypt: false })
+
+        await Promise.all([uploadGifProps, uploadGifB64, updateGifList, uploadGifBlob, uploadShareableHTML])
         return { id: gifId, ...props, b64 }
     } catch (err) {
+        console.log(err)
         return error(err.message)
     }
 }
@@ -65,7 +106,7 @@ export const uploadGifForUser = async (props, b64: string, userId: any): Promise
 export const getUserGifs = async (userId: any): GetAllGifsResponseInterface => {
     let gifIds = JSON.parse(await getFile(`${USER_PATH}/${userId}/gifs`))
     if (!gifIds) {
-        return []
+        return { gifIds: [], gifProps: [], $getGifs: null }
     } else {
         /** @return a promise that awaits a get, and resolves with id mapping to the data if successful */
         const mapPropsToB64 = (props, getB64) => {
@@ -106,8 +147,9 @@ export const deleteUserGifs = async (ids, userId): [string] => {
         let updateUserGifs = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(newGifIds))
         let deleteGifProps = ids.map(id => deleteFile(`${GIFS_PATH}/${id}`))
         let deleteGifB64s = ids.map(id => deleteFile(`${GIFS_PATH}/${id}/b64`))
-
-        await Promise.all([...deleteGifB64s, ...deleteGifProps, updateUserGifs])
+        let deleteShareableHtmls = ids.map(id => deleteFile(`${GIFS_PATH}/${gifId}/shared`))
+        let deleteGifBlobs = ids.map(id => deleteFile(`${GIFS_PATH}/${gifId}/blob`))
+        await Promise.all([...deleteGifB64s, ...deleteGifProps, ...deleteShareableHtmls, ...deleteGifBlobs, updateUserGifs])
         return ids
     } catch (err) {
         return error(err.message)

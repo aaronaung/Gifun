@@ -112,7 +112,7 @@ function MediaCard({ gifProperties, gifB64 }) {
     const handleSavePreview = useCallback(async () => {
         setSaving(true)
         let resp = await uploadGifForUser(gifProperties, gifB64, userId)
-        dispatch(addGifs([resp]))
+        // dispatch(addGifs([resp]))
         setSaving(false)
     }, [])
 
@@ -130,8 +130,8 @@ function MediaCard({ gifProperties, gifB64 }) {
             <CardActions style={{ justifyContent: 'space-around' }}>
                 <Tooltip title={<Typography variant="subtitle2">Download</Typography>}>
                     <a download="gifuru.gif" href={gifB64} style={{ textDecoration: 'none' }}>
-                        <Button size="medium" style={{ color: '#66bb6a' }} className={classes.actionBtns}>
-                            <CloudDownloadIcon fontSize="default" />
+                        <Button disabled={saving} size="medium" style={{ color: '#66bb6a' }} className={classes.actionBtns}>
+                            <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
                         </Button>
                     </a>
                 </Tooltip>
@@ -151,14 +151,17 @@ function MediaCard({ gifProperties, gifB64 }) {
                 </Tooltip>
 
                 <Tooltip title={<Typography variant="subtitle2">Cancel</Typography>}>
-                    <Button
-                        size="medium"
-                        style={{ color: '#d32f2f' }}
-                        className={classes.actionBtns}
-                        onClick={handleRemovePreview}
-                    >
-                        <CancelIcon fontSize="default" />
-                    </Button>
+                    <span>
+                        <Button
+                            disabled={saving}
+                            size="medium"
+                            style={{ color: '#d32f2f' }}
+                            className={classes.actionBtns}
+                            onClick={handleRemovePreview}
+                        >
+                            <CancelIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
+                        </Button>
+                    </span>
                 </Tooltip>
             </CardActions>
         </Card>
@@ -266,12 +269,12 @@ const PreviewGif = () => {
                 clearInterval(interval)
                 setCounter(3)
                 setPreviewState({ counting: false, recording: true, processing: false })
-                let newDimensions = {
+                let newProps = {
+                    ...formValues,
                     gifHeight: webcamRef.current.video.videoHeight,
                     gifWidth: webcamRef.current.video.videoWidth,
                 }
-
-                let b64 = await generateGif({ ...formValues, ...newDimensions })
+                let b64 = await generateGif(newProps)
                 setPreviewState({ counting: false, recording: false, processing: false })
                 dispatch(newPreview({ b64, properties: formValues }))
             }, COUNTER_INTERVAL * 3)
@@ -291,7 +294,7 @@ const PreviewGif = () => {
             <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
                 Preview
             </Typography>
-            {!b64 ? (
+            {!b64 && !cameraState.loading ? (
                 <div className={classes.topBar} style={{ width: previewSize.width }}>
                     <FormControlLabel
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}

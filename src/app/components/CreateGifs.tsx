@@ -73,7 +73,7 @@ const CreateGifs = () => {
         setTabValue(newValue)
     }
     return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} className={classes.main}>
             <Grid item xs={12} lg={12}>
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example" className={classes.tabs}>
                     <Tab label="Webcam" {...a11yProps(0)} />

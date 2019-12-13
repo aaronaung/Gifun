@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useRef, useEffect } from 'react'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
@@ -15,9 +15,21 @@ import DownloadIcon from '@material-ui/icons/CloudDownloadTwoTone'
 import DeleteIcon from '@material-ui/icons/DeleteTwoTone'
 import Slide from '@material-ui/core/Slide'
 import { TransitionProps } from '@material-ui/core/transitions'
-import { Tooltip, CircularProgress } from '@material-ui/core'
-import { deleteUserGifs } from '../services/gif.service'
+import {
+    Tooltip,
+    CircularProgress,
+    TextField,
+    DialogTitle,
+    DialogContent,
+    FormControl,
+    Input,
+    InputAdornment,
+} from '@material-ui/core'
+import { deleteUserGifs, getGaiaHubUrl } from '../services/gif.service'
 import { getUser } from '../services/auth'
+import ShareIcon from '@material-ui/icons/Share'
+import AssignmentIcon from '@material-ui/icons/Assignment'
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn'
 import * as _ from 'lodash'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -50,6 +62,9 @@ const useStyles = makeStyles((theme: Theme) =>
         loadingIcon: {
             position: 'absolute',
         },
+        copyBoard: {
+            // width: 'fit-content',
+        },
     })
 )
 
@@ -57,10 +72,72 @@ const Transition = React.forwardRef<unknown, TransitionProps>(function Transitio
     return <Slide direction="up" ref={ref} {...props} />
 })
 
+const CopyBoard = function({ open, setOpen, shareableLink }) {
+    const classes = useStyles()
+    const linkRef = useRef(null)
+    const [copied, setCopied] = useState(false)
+
+    const handleCopy = () => {
+        if (linkRef) {
+            linkRef.current.select()
+            document.execCommand('copy')
+            linkRef.current.blur()
+            setCopied(true)
+        }
+    }
+
+    return (
+        <Dialog
+            fullWidth
+            className={classes.copyBoard}
+            aria-labelledby="dialog"
+            open={open}
+            onBackdropClick={() => {
+                setOpen(false)
+                setTimeout(() => setCopied(false), 1000)
+            }}
+        >
+            <DialogTitle id="dialog">Share your GIF</DialogTitle>
+            <DialogContent style={{ paddingBottom: 20 }}>
+                <TextField
+                    inputRef={linkRef}
+                    fullWidth
+                    variant="outlined"
+                    value={shareableLink}
+                    InputProps={{
+                        endAdornment: (
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Tooltip title={copied ? `Copied` : `Copy to Clipboard`}>
+                                    {copied ? (
+                                        <AssignmentTurnedInIcon
+                                            style={{ color: '#66bb6a', marginLeft: 15 }}
+                                            fontSize="large"
+                                        ></AssignmentTurnedInIcon>
+                                    ) : (
+                                        <AssignmentIcon
+                                            style={{ cursor: 'pointer', marginLeft: 15 }}
+                                            color="secondary"
+                                            fontSize="large"
+                                            onClick={handleCopy}
+                                        ></AssignmentIcon>
+                                    )}
+                                </Tooltip>
+                            </div>
+                        ),
+                    }}
+                ></TextField>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 export default function GifLightBox({ gif, open, setOpen, setGifs }) {
     const classes = useStyles()
     const { identityAddress: userId } = getUser()
+    const gaiaHubUrl = getGaiaHubUrl()
     const [deleting, setDeleting] = useState(false)
+    const [openCopyBoard, setOpenCopyBoard] = useState(false)
+    const shareableLink = gif && `${gaiaHubUrl}/gifs/${gif.id}/shared`
 
     const handleClose = () => {
         setOpen(false)
@@ -85,8 +162,13 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
         }
     }
 
+    const handleShare = async () => {
+        setOpenCopyBoard(true)
+    }
+
     return (
         <div>
+            <CopyBoard open={openCopyBoard} setOpen={setOpenCopyBoard} shareableLink={shareableLink}></CopyBoard>
             <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
                 <AppBar className={classes.appBar} color="inherit">
                     <Toolbar>
@@ -108,9 +190,24 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
                             </a>
                         </Tooltip>
                         <Tooltip title={<Typography variant="subtitle2">Delete</Typography>}>
-                            <Button onClick={handleDelete} className={classes.actionBtn} disabled={deleting}>
-                                <DeleteIcon style={{ color: `${!deleting ? '#d32f2f' : 'grey'}` }} fontSize="large"></DeleteIcon>
-                            </Button>
+                            <span>
+                                <Button onClick={handleDelete} className={classes.actionBtn} disabled={deleting}>
+                                    <DeleteIcon
+                                        style={{ color: `${!deleting ? '#d32f2f' : 'grey'}` }}
+                                        fontSize="large"
+                                    ></DeleteIcon>
+                                </Button>
+                            </span>
+                        </Tooltip>
+                        <Tooltip title={<Typography variant="subtitle2">Share</Typography>}>
+                            <span>
+                                <Button onClick={handleShare} className={classes.actionBtn} disabled={deleting}>
+                                    <ShareIcon
+                                        style={{ color: `${!deleting ? '#d32f2f' : 'grey'}` }}
+                                        fontSize="large"
+                                    ></ShareIcon>
+                                </Button>
+                            </span>
                         </Tooltip>
                     </Toolbar>
                 </AppBar>
