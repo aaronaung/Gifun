@@ -18,7 +18,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { previewSelector } from '../redux/preview/preview.selector'
 import { makeStyles } from '@material-ui/styles'
-import { StaticQuery, graphql } from 'gatsby'
+import { StaticQuery, graphql, navigate } from 'gatsby'
 import defaultGif from '../../images/look-left.gif'
 import Card from '@material-ui/core/Card'
 import CardActionArea from '@material-ui/core/CardActionArea'
@@ -37,6 +37,8 @@ import Webcam from 'react-webcam'
 import { formSelector } from '../redux/form/form.selector'
 import { removePreview, pendingPreview, newPreview } from '../redux/preview/preview.action'
 import { useCameraContext } from '../contexts/CameraContext'
+import { useSnackbarContext } from '../contexts/SnackbarContext'
+import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -107,12 +109,24 @@ function MediaCard({ gifProperties, gifB64 }) {
     const [saving, setSaving] = useState(false)
     const [cameraState, setCameraState] = useCameraContext()
     const { identityAddress: userId } = getUser()
+    const { openSnackbar } = useSnackbarContext()
     const dispatch = useDispatch()
 
     const handleSavePreview = useCallback(async () => {
         setSaving(true)
         let resp = await uploadGifForUser(gifProperties, gifB64, userId)
-        // dispatch(addGifs([resp]))
+        openSnackbar({
+            message: 'Save successful',
+            action: [
+                <Tooltip
+                    key="checkitout"
+                    style={{ cursor: 'pointer', color: 'white' }}
+                    title={<Typography variant="subtitle1">See it in your favorite list</Typography>}
+                >
+                    <FavoriteIcon key="undo" color="secondary" size="small" onClick={() => navigate('/app')}></FavoriteIcon>
+                </Tooltip>,
+            ],
+        })
         setSaving(false)
     }, [])
 
@@ -130,7 +144,13 @@ function MediaCard({ gifProperties, gifB64 }) {
             <CardActions style={{ justifyContent: 'space-around' }}>
                 <Tooltip title={<Typography variant="subtitle2">Download</Typography>}>
                     <a download="gifuru.gif" href={gifB64} style={{ textDecoration: 'none' }}>
-                        <Button disabled={saving} size="medium" style={{ color: '#66bb6a' }} className={classes.actionBtns}>
+                        <Button
+                            onClick={() => openSnackbar({ message: 'Download successful', variant: 'success' })}
+                            disabled={saving}
+                            size="medium"
+                            style={{ color: '#66bb6a' }}
+                            className={classes.actionBtns}
+                        >
                             <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
                         </Button>
                     </a>
@@ -208,6 +228,7 @@ const PreviewGif = () => {
     /** State variables */
     const [previewSize, setPreviewSize] = useState({ width: 300, height: 300 })
     const [cameraState, setCameraState] = useCameraContext()
+    const { openSnackbar } = useSnackbarContext()
     const [counter, setCounter] = useState(3)
     const [showText, setShowText] = useState(true)
     const [openDialog, setOpenDialog] = useState(false)
@@ -285,6 +306,7 @@ const PreviewGif = () => {
                     setPreviewState({ counting: false, recording: false, processing: true })
                 }
                 dispatch(pendingPreview(false))
+                openSnackbar({ message: 'Preview ready', variant: 'info' })
             }, COUNTER_INTERVAL * 6)
         }
     }, [formValues])

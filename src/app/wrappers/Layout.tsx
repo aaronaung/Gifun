@@ -20,6 +20,9 @@ import MailIcon from '@material-ui/icons/Mail'
 import GifIcon from '@material-ui/icons/Gif'
 import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
 import { navigate } from 'gatsby'
+import gifuruLogo from '../../images/gifuru.png'
+import { Tooltip } from '@material-ui/core'
+import SimpleSnackbar from '../components/Snackbar'
 
 const drawerWidth = 240
 
@@ -45,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
             }),
         },
         menuButton: {
-            marginRight: 36,
+            marginRight: 40,
         },
         hide: {
             display: 'none',
@@ -74,6 +77,11 @@ const useStyles = makeStyles((theme: Theme) =>
                 width: theme.spacing(9) + 1,
             },
         },
+
+        gifuruLogo: {
+            width: 50,
+            height: 50,
+        },
         toolbar: {
             display: 'flex',
             alignItems: 'center',
@@ -89,6 +97,18 @@ const useStyles = makeStyles((theme: Theme) =>
             backgroundColor: '#1f1f1f',
             color: 'white',
             overflow: 'hidden',
+            paddingBottom: '80px',
+        },
+        footer: {
+            marginTop: '50px',
+            background: '#2f2f2f',
+            position: 'fixed',
+            bottom: '0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '50px',
         },
     })
 )
@@ -127,9 +147,10 @@ export default function MiniDrawer({ children }) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap>
+                    <img src={gifuruLogo} className={classes.gifuruLogo} alt="" />
+                    {/* <Typography variant="h6" noWrap>
                         Welcome to GIFuru
-                    </Typography>
+                    </Typography> */}
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -153,25 +174,33 @@ export default function MiniDrawer({ children }) {
                 </div>
                 <Divider />
                 <List>
-                    <ListItem button key={'My Gifs'} onClick={() => navigate('/app')}>
-                        <ListItemIcon>
-                            <FavoriteIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="My Gifs" />
-                    </ListItem>
+                    <Tooltip title={!open ? <Typography variant="subtitle2">My GIFs</Typography> : ''} placement="right">
+                        <ListItem button key={'My Gifs'} onClick={() => navigate('/app')}>
+                            <ListItemIcon style={{ paddingLeft: 8 }}>
+                                <FavoriteIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="My Gifs" />
+                        </ListItem>
+                    </Tooltip>
 
-                    <ListItem button key={'Create Gifs'} onClick={() => navigate('/app/create')}>
-                        <ListItemIcon>
-                            <AddBoxIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Create Gifs" />
-                    </ListItem>
+                    <Tooltip title={!open ? <Typography variant="subtitle2">Create GIFs</Typography> : ''} placement="right">
+                        <ListItem button key={'Create Gifs'} onClick={() => navigate('/app/create')}>
+                            <ListItemIcon style={{ paddingLeft: 8 }}>
+                                <AddBoxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Create Gifs" />
+                        </ListItem>
+                    </Tooltip>
                 </List>
             </Drawer>
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 {children}
             </main>
+            <div className={classes.footer}>
+                <Typography color="textSecondary">© 2019 Gifuru, Built just for you </Typography>
+            </div>
+            <SimpleSnackbar></SimpleSnackbar>
         </div>
     )
 }

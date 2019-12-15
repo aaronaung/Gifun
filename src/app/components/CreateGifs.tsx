@@ -35,6 +35,7 @@ interface TabPanelProps {
 const useStyles = makeStyles((theme: Theme) => ({
     tabs: {
         paddingLeft: theme.spacing(2),
+        justifyContent: 'center',
     },
 }))
 

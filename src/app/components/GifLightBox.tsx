@@ -31,6 +31,7 @@ import ShareIcon from '@material-ui/icons/Share'
 import AssignmentIcon from '@material-ui/icons/Assignment'
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn'
 import * as _ from 'lodash'
+import { useSnackbarContext } from '../contexts/SnackbarContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -76,6 +77,7 @@ const CopyBoard = function({ open, setOpen, shareableLink }) {
     const classes = useStyles()
     const linkRef = useRef(null)
     const [copied, setCopied] = useState(false)
+    const { openSnackbar } = useSnackbarContext()
 
     const handleCopy = () => {
         if (linkRef) {
@@ -83,6 +85,7 @@ const CopyBoard = function({ open, setOpen, shareableLink }) {
             document.execCommand('copy')
             linkRef.current.blur()
             setCopied(true)
+            openSnackbar({ message: 'Copied to clipboard', variant: 'success' })
         }
     }
 
@@ -97,8 +100,11 @@ const CopyBoard = function({ open, setOpen, shareableLink }) {
                 setTimeout(() => setCopied(false), 1000)
             }}
         >
-            <DialogTitle id="dialog">Share your GIF</DialogTitle>
+            <DialogTitle id="dialog">Share it with your friends!</DialogTitle>
             <DialogContent style={{ paddingBottom: 20 }}>
+                <Typography style={{ marginBottom: 10 }} color="error">
+                    Anyone with the link below can view this GIF
+                </Typography>
                 <TextField
                     inputRef={linkRef}
                     fullWidth
@@ -137,7 +143,7 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
     const gaiaHubUrl = getGaiaHubUrl()
     const [deleting, setDeleting] = useState(false)
     const [openCopyBoard, setOpenCopyBoard] = useState(false)
-    const shareableLink = gif && `${gaiaHubUrl}/gifs/${gif.id}/shared`
+    const shareableLink = gif && `${gaiaHubUrl}/gifs/${gif.id}/blob`
 
     const handleClose = () => {
         setOpen(false)
@@ -203,7 +209,7 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
                             <span>
                                 <Button onClick={handleShare} className={classes.actionBtn} disabled={deleting}>
                                     <ShareIcon
-                                        style={{ color: `${!deleting ? '#d32f2f' : 'grey'}` }}
+                                        style={{ color: `${!deleting ? 'rgb(85, 230, 255)' : 'grey'}` }}
                                         fontSize="large"
                                     ></ShareIcon>
                                 </Button>

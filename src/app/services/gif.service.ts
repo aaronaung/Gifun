@@ -93,9 +93,9 @@ export const uploadGifForUser = async (props, b64: string, userId: any): Promise
         let uploadGifB64 = putFile(`${GIFS_PATH}/${gifId}/b64`, b64)
         let updateGifList = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(userGifs))
         let uploadGifBlob = putFile(`${GIFS_PATH}/${gifId}/blob`, gifBlob, { contentType: 'image/gif', encrypt: false })
-        let uploadShareableHTML = putFile(`${GIFS_PATH}/${gifId}/shared`, htmlText, { contentType: 'text/html', encrypt: false })
+        // let uploadShareableHTML = putFile(`${GIFS_PATH}/${gifId}/shared`, htmlText, { contentType: 'text/html', encrypt: false })
 
-        await Promise.all([uploadGifProps, uploadGifB64, updateGifList, uploadGifBlob, uploadShareableHTML])
+        await Promise.all([uploadGifProps, uploadGifB64, updateGifList, uploadGifBlob])
         return { id: gifId, ...props, b64 }
     } catch (err) {
         console.log(err)
@@ -147,7 +147,7 @@ export const deleteUserGifs = async (ids, userId): [string] => {
         let updateUserGifs = putFile(`${USER_PATH}/${userId}/gifs`, JSON.stringify(newGifIds))
         let deleteGifProps = ids.map(id => deleteFile(`${GIFS_PATH}/${id}`))
         let deleteGifB64s = ids.map(id => deleteFile(`${GIFS_PATH}/${id}/b64`))
-        let deleteShareableHtmls = ids.map(id => deleteFile(`${GIFS_PATH}/${gifId}/shared`))
+        // let deleteShareableHtmls = ids.map(id => deleteFile(`${GIFS_PATH}/${gifId}/shared`))
         let deleteGifBlobs = ids.map(id => deleteFile(`${GIFS_PATH}/${gifId}/blob`))
         await Promise.all([...deleteGifB64s, ...deleteGifProps, ...deleteShareableHtmls, ...deleteGifBlobs, updateUserGifs])
         return ids

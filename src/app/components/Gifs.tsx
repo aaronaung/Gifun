@@ -5,6 +5,7 @@ import GifsGrid from './GifsGrid'
 import { useDispatch, useSelector } from 'react-redux'
 import { addGifs, removeGifs } from '../redux/gifs/gifs.action'
 import { gifsSelector } from '../redux/gifs/gifs.selector'
+import { useSnackbarContext } from '../contexts/SnackbarContext'
 
 const Gifs = () => {
     const { identityAddress: userId } = getUser()
@@ -12,8 +13,7 @@ const Gifs = () => {
     const gifs = useSelector(state => gifsSelector(state))
     const [datedGifs, setDatedGifs] = useState({}) /** sorted by date */
     const [loading, setLoading] = useState(false)
-
-    const mapGifToDate = gif => {}
+    const { openSnackbar } = useSnackbarContext()
 
     const fetchUserGifs = async () => {
         setLoading(true)
@@ -51,7 +51,10 @@ const Gifs = () => {
                     }
                 },
                 complete: () => {
-                    console.log('ALL LOADED')
+                    openSnackbar({
+                        message: 'Completed fetching all GIFs',
+                        variant: 'success',
+                    })
                 },
             })
         }
