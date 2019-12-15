@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addGifs, removeGifs } from '../redux/gifs/gifs.action'
 import { gifsSelector } from '../redux/gifs/gifs.selector'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
+import sadface from '../../images/sad.gif'
 
 const Gifs = () => {
     const { identityAddress: userId } = getUser()
@@ -56,6 +57,13 @@ const Gifs = () => {
                         variant: 'success',
                     })
                 },
+            })
+        } else {
+            openSnackbar({
+                message: 'No GIF to load',
+                action: [<img src={sadface} style={{ height: 100, width: 'auto' }}></img>],
+                variant: 'warning',
+                autoHideDuration: 10000,
             })
         }
     }

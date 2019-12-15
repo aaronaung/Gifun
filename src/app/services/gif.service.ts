@@ -56,12 +56,12 @@ const b64ToBlob = b64 => {
 const constructHTMLSharable = (b64, imageLink) => {
     let htmlText = `
         <meta property="og:type" content="website"/>
-        <meta property="og:title" content="Gifuru GIF"></meta>
+        <meta property="og:title" content="Gifun GIF"></meta>
         <meta property="og:image" content="${imageLink}"/>
         <meta property="og:type" content="video.other"/>
         <meta property="og:url" content="${imageLink}"/>
-        <meta property="og:site_name" content="Gifuru"/>
-        <meta property="og:description" content="Get your personalized GIF content with Gifuru."/>
+        <meta property="og:site_name" content="Gifun"/>
+        <meta property="og:description" content="Get your personalized GIF content with Gifun."/>
         <img src=${b64}></img>`
     return htmlText
 }

@@ -20,7 +20,7 @@ import MailIcon from '@material-ui/icons/Mail'
 import GifIcon from '@material-ui/icons/Gif'
 import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
 import { navigate } from 'gatsby'
-import gifuruLogo from '../../images/gifuru.png'
+import gifunLogo from '../../images/gifun.png'
 import { Tooltip } from '@material-ui/core'
 import SimpleSnackbar from '../components/Snackbar'
 
@@ -78,7 +78,7 @@ const useStyles = makeStyles((theme: Theme) =>
             },
         },
 
-        gifuruLogo: {
+        gifunLogo: {
             width: 50,
             height: 50,
         },
@@ -147,10 +147,10 @@ export default function MiniDrawer({ children }) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <img src={gifuruLogo} className={classes.gifuruLogo} alt="" />
-                    {/* <Typography variant="h6" noWrap>
-                        Welcome to GIFuru
-                    </Typography> */}
+                    <img src={gifunLogo} className={classes.gifunLogo} alt="" />
+                    <Typography variant="h6" color="secondary" noWrap>
+                        <b>GIFun</b>
+                    </Typography>
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -198,7 +198,7 @@ export default function MiniDrawer({ children }) {
                 {children}
             </main>
             <div className={classes.footer}>
-                <Typography color="textSecondary">© 2019 Gifuru, Built just for you </Typography>
+                <Typography color="textSecondary">© 2019 Gifun, Built just for you </Typography>
             </div>
             <SimpleSnackbar></SimpleSnackbar>
         </div>

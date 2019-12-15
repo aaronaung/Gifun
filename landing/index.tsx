@@ -35,8 +35,14 @@ export const LandingPage = () => {
             </Helmet>
 
             <div id="page-top">
-                <div className="container" style={{ position: 'absolute', zIndex: 1, margin: 50 }}>
-                    <img src="img/gifuru.png" style={{ width: 80, height: 80 }}></img>
+                <div
+                    className="container"
+                    style={{ display: 'flex', alignItems: 'center', position: 'absolute', zIndex: 1, margin: 50 }}
+                >
+                    <img src="img/gifun.png" style={{ width: 80, height: 80 }}></img>
+                    <h3 style={{ color: 'white' }}>
+                        <b>GIFun</b>
+                    </h3>
                 </div>
 
                 <header className="masthead">

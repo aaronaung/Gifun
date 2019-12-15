@@ -138,12 +138,12 @@ function MediaCard({ gifProperties, gifB64 }) {
     return (
         <Card style={{ minWidth: '200px', width: `${gifWidth}px` }}>
             <CardActionArea>
-                <CardMedia image={gifB64} title="Gifuru Preview" style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }} />
+                <CardMedia image={gifB64} title="Gifun Preview" style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }} />
             </CardActionArea>
 
             <CardActions style={{ justifyContent: 'space-around' }}>
                 <Tooltip title={<Typography variant="subtitle2">Download</Typography>}>
-                    <a download="gifuru.gif" href={gifB64} style={{ textDecoration: 'none' }}>
+                    <a download="gifun-preview.gif" href={gifB64} style={{ textDecoration: 'none' }}>
                         <Button
                             onClick={() => openSnackbar({ message: 'Download successful', variant: 'success' })}
                             disabled={saving}

@@ -186,7 +186,7 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
                         </Typography>
                         <Tooltip title={<Typography variant="subtitle2">Download</Typography>}>
                             <a
-                                download={`gifuru-${(gif && gif.id) || ''}.gif`}
+                                download={`gifun-${(gif && gif.id) || ''}.gif`}
                                 href={(gif && gif.b64) || ''}
                                 style={{ textDecoration: 'none' }}
                             >
