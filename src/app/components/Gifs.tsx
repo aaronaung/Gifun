@@ -52,7 +52,7 @@ const Gifs = () => {
                 },
                 complete: () => {
                     openSnackbar({
-                        message: 'Completed fetching all GIFs',
+                        message: 'Successfully fetched all GIFs',
                         variant: 'success',
                     })
                 },

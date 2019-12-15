@@ -209,7 +209,7 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
                             <span>
                                 <Button onClick={handleShare} className={classes.actionBtn} disabled={deleting}>
                                     <ShareIcon
-                                        style={{ color: `${!deleting ? 'rgb(85, 230, 255)' : 'grey'}` }}
+                                        style={{ color: `${!deleting ? 'rgb(253, 102, 136)' : 'grey'}` }}
                                         fontSize="large"
                                     ></ShareIcon>
                                 </Button>

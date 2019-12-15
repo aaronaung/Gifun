@@ -19,7 +19,11 @@ const GIFS_PATH = 'gifs'
 export const getGaiaHubUrl = () => {
     let blockStackSession = JSON.parse(localStorage.getItem('blockstack-session'))
     let gaiaHubConfig = blockStackSession.userData.gaiaHubConfig
-    return `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}`
+    if (gaiaHubConfig) {
+        return `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}`
+    } else {
+        return {}
+    }
 }
 
 const _massageGIFProps = props => {
