@@ -23,6 +23,7 @@ import { navigate } from 'gatsby'
 import gifunLogo from '../../images/gifun.png'
 import { Tooltip } from '@material-ui/core'
 import SimpleSnackbar from '../components/Snackbar'
+import { isMobile } from 'react-device-detect'
 
 const drawerWidth = 240
 
@@ -154,7 +155,7 @@ export default function MiniDrawer({ children }) {
                 </Toolbar>
             </AppBar>
             <Drawer
-                variant="permanent"
+                variant={isMobile ? 'temporary' : 'permanent'}
                 className={clsx(classes.drawer, {
                     [classes.drawerOpen]: open,
                     [classes.drawerClose]: !open,

@@ -302,9 +302,9 @@ const PreviewGif = () => {
 
             setTimeout(() => {
                 /** after the gif capture time is over and gif is still processing */
-                if (previewState.processing === false && !b64) {
-                    setPreviewState({ counting: false, recording: false, processing: true })
-                }
+                // if (previewState.processing === false && !b64) {
+                //     setPreviewState({ counting: false, recording: false, processing: true })
+                // }
                 dispatch(pendingPreview(false))
                 openSnackbar({ message: 'Preview ready', variant: 'info' })
             }, COUNTER_INTERVAL * 6)

@@ -93,7 +93,7 @@ export const LandingPage = () => {
                     <div className="container">
                         <div className="section-heading text-center">
                             <h2>Secure, Private, and Fun</h2>
-                            <p className="text-muted">Have fun creating and rest assured your data is secured</p>
+                            <p className="text-muted">Have fun creating and rest assured your data is secure</p>
                         </div>
                         <div className="row">
                             <div className="col-lg-12 my-auto">
@@ -113,8 +113,8 @@ export const LandingPage = () => {
                                                 <i className="icon-lock text-primary"></i>
                                                 <h3>Secure</h3>
                                                 <p className="text-muted">
-                                                    All the sensitive data is encrypted and uploaded onto a decentralized network
-                                                    powered by blockchain technology. No one, but you can access your data
+                                                    All the sensitive data is encrypted and uploaded to a decentralized network
+                                                    powered by blockchain technology. No one but you can access your data
                                                 </p>
                                             </div>
                                         </div>

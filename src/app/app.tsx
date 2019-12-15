@@ -27,7 +27,7 @@ const App = () => {
                         <Layout>
                             <Router>
                                 <PrivateRoute path="/app" component={Gifs} />
-                                <PrivateRoute path="/app/create" component={CreateGifs} />
+                                <PublicRoute path="/app/create" component={CreateGifs} />
                                 <PrivateRoute path="/" default={true} component={NotFound} />
                             </Router>
                         </Layout>
@@ -38,7 +38,8 @@ const App = () => {
     )
 }
 function PublicRoute(props) {
-    return <div>{props.children}</div>
+    let Component = props.component
+    return <Component></Component>
 }
 
 export default App
