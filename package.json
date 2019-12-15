@@ -41,7 +41,7 @@
     ],
     "license": "MIT",
     "scripts": {
-        "develop": "gatsby develop -p 8001",
+        "develop": "gatsby develop -H 0.0.0.0 -p 8001",
         "start": "run-p start:**",
         "start:app": "npm run develop",
         "build": "run-p build:**",

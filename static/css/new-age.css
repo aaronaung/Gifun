@@ -184,6 +184,14 @@ header.masthead .device-container .screen img {
     border-radius: 3px;
 }
 
+header.masthead .container .my-auto .pointUp {
+    display: none;
+}
+header.masthead .container .my-auto .landingGif {
+    width: 100%;
+    height: auto;
+}
+
 @media (min-width: 992px) {
     header.masthead {
         height: 100vh;
@@ -200,6 +208,25 @@ header.masthead .device-container .screen img {
     }
     header.masthead .device-container {
         max-width: 325px;
+    }
+}
+
+@media (max-width: 900px) {
+    header.masthead .container {
+        margin-top: 0;
+    }
+    header.masthead .container .my-auto .pointLeft {
+        display: none;
+    }
+    header.masthead .container .my-auto .pointUp {
+        display: block;
+    }
+    #page-top .logoContainer {
+        margin-left: 0 !important;
+        margin-bottom: 0 !important;
+        justify-content: center;
+        margin-top: 50px;
+        width: 100%;
     }
 }
 

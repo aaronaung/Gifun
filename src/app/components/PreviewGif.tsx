@@ -18,7 +18,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { previewSelector } from '../redux/preview/preview.selector'
 import { makeStyles } from '@material-ui/styles'
-import { StaticQuery, graphql, navigate } from 'gatsby'
+import { navigate } from 'gatsby'
 import defaultGif from '../../images/look-left.gif'
 import Card from '@material-ui/core/Card'
 import CardActionArea from '@material-ui/core/CardActionArea'

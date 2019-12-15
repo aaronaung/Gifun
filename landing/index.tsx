@@ -36,7 +36,7 @@ export const LandingPage = () => {
 
             <div id="page-top">
                 <div
-                    className="container"
+                    className="logoContainer"
                     style={{ display: 'flex', alignItems: 'center', position: 'absolute', zIndex: 1, margin: 50 }}
                 >
                     <img src="img/gifun.png" style={{ width: 80, height: 80 }}></img>
@@ -67,7 +67,13 @@ export const LandingPage = () => {
                                 </div>
                             </div>
                             <div className="col-lg-5 my-auto">
-                                <img src="img/beyonce.gif" style={{ borderRadius: 10 }} alt="" />
+                                <img
+                                    src="img/pointleft.gif"
+                                    className="landingGif pointLeft"
+                                    style={{ borderRadius: 10 }}
+                                    alt=""
+                                />
+                                <img src="img/pointup.gif" className="landingGif pointUp" style={{ borderRadius: 10 }} alt="" />
                                 {/* <div className="device-container">
                                     <div className="device-mockup macbook_2015 portrait white" style={{width:}}>
                                         <div className="device">
