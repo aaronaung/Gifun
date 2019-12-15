@@ -1,4 +1,4 @@
-import gifShot from 'gifShot'
+import gifShot from 'gifshot'
 import { GetAllGifsResponseInterface, GifInterface } from '../interfaces/Gifs.interface'
 import { putFile, getFile, deleteFile } from 'blockstack'
 import { v4 as uuid } from 'uuid'
