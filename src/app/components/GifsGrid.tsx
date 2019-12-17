@@ -16,6 +16,7 @@ import dontworry from '../../images/dontworry.gif'
 import getstarted from '../../images/getstarted.gif'
 import clickme from '../../images/clickme.gif'
 import { navigate } from 'gatsby'
+import clsx from 'clsx'
 
 const GRIDITEM_SIZE = { width: 250, height: 250 }
 
@@ -39,8 +40,19 @@ const useStyles = makeStyles((theme: Theme) => ({
         left: '50%',
         transform: 'translate(-50%,-50%)',
         textAlign: 'center',
+        display: 'flex',
+        [theme.breakpoints.down('sm')]: {
+            flexDirection: 'column',
+        },
     },
     funnyGif: {
+        borderRadius: 5,
+        [theme.breakpoints.down('sm')]: {
+            width: '220px',
+            height: 'auto',
+            marginBottom: 10,
+        },
+        marginRight: 10,
         height: '200px',
         width: 'auto',
     },
@@ -50,22 +62,17 @@ function NoGif() {
     const classes = useStyles()
     return (
         <div className={classes.centerItems}>
-            {/* <Typography variant="subtitle">
-                
-            </Typography> */}
-            <div style={{ display: 'flex' }}>
-                <img className={classes.funnyGif} src={ihavenothing} alt="" />
-                <img className={classes.funnyGif} src={dontworry} alt="" />
-                <Tooltip title={<Typography variant="subtitle2">Click here to start</Typography>}>
-                    <img
-                        onClick={() => navigate('/app/create')}
-                        className={classes.funnyGif}
-                        style={{ cursor: 'pointer' }}
-                        src={clickme}
-                        alt=""
-                    />
-                </Tooltip>
-            </div>
+            <img className={classes.funnyGif} src={ihavenothing} alt="" />
+            <img className={classes.funnyGif} src={dontworry} alt="" />
+            <Tooltip title={<Typography variant="subtitle2">Click here to start</Typography>}>
+                <img
+                    onClick={() => navigate('/app/create')}
+                    className={classes.funnyGif}
+                    style={{ cursor: 'pointer' }}
+                    src={clickme}
+                    alt=""
+                />
+            </Tooltip>
         </div>
     )
 }

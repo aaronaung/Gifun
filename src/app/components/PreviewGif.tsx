@@ -316,13 +316,7 @@ const PreviewGif = () => {
                     gifHeight: webcamRef.current.video.videoHeight,
                     gifWidth: webcamRef.current.video.videoWidth,
                 }
-                try {
-                    let b64 = await generateGif(newProps)
-                } catch (err) {
-                    alert(err)
-                    alert(JSON.stringify(err))
-                }
-
+                let b64 = await generateGif(newProps)
                 setPreviewState({ counting: false, recording: false, processing: false })
                 dispatch(newPreview({ b64, properties: formValues }))
             }, COUNTER_INTERVAL * 3)

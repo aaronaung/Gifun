@@ -88,7 +88,7 @@ export default function SimpleSnackbar() {
                         </IconButton>,
                     ]}
                     message={
-                        <span id="client-snackbar" className={classes.message}>
+                        <span key="snackbarContent" id="client-snackbar" className={classes.message}>
                             <Icon className={clsx(classes.icon, classes.iconVariant)} />
                             <Typography variant="subtitle1">{snackbarProps.message}</Typography>
                         </span>

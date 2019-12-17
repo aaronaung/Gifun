@@ -50,6 +50,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         menuButton: {
             marginRight: 40,
+            [theme.breakpoints.down('sm')]: {
+                marginRight: 10,
+            },
         },
         hide: {
             display: 'none',
@@ -78,7 +81,6 @@ const useStyles = makeStyles((theme: Theme) =>
                 width: theme.spacing(9) + 1,
             },
         },
-
         gifunLogo: {
             width: 50,
             height: 50,

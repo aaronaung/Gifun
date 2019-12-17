@@ -25,6 +25,9 @@ import { pendingPreview, newPreview } from '../redux/preview/preview.action'
 import { generateGif } from '../services/gif.service'
 import { after } from 'eol'
 import { CameraProvider, useCameraContext } from '../contexts/CameraContext'
+import { isMobile } from 'react-device-detect'
+import sorry from '../../images/sorry.gif'
+import clsx from 'clsx'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -36,6 +39,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     tabs: {
         paddingLeft: theme.spacing(2),
         justifyContent: 'center',
+    },
+    sorryGif: {
+        width: '100%',
+        marginTop: 20,
+        borderRadius: 5,
     },
 }))
 
@@ -83,15 +91,25 @@ const CreateGifs = () => {
                     <Tab label="Video" {...a11yProps(1)} />
                 </Tabs> */}
                 <TabPanel value={tabValue} index={0}>
-                    <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-                        <Grid item xs={12} md={7} lg={7} style={{ marginBottom: '25px' }}>
-                            <CreateForm />
-                        </Grid>
+                    {isMobile ? (
+                        <>
+                            <Typography>
+                                Because of technical limitations, the browser version of <b>GIFun</b> webcam feature is not
+                                supported on mobile devices at the moment.
+                            </Typography>
+                            <img src={sorry} className={clsx(classes.sorryGif)}></img>
+                        </>
+                    ) : (
+                        <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
+                            <Grid item xs={12} md={7} lg={7} style={{ marginBottom: '25px' }}>
+                                <CreateForm />
+                            </Grid>
 
-                        {/* <Grid item xs={12} md={4} lg={4} style={{ paddingLeft: '16px' }}> */}
-                        <PreviewGif />
-                        {/* </Grid> */}
-                    </Grid>
+                            {/* <Grid item xs={12} md={4} lg={4} style={{ paddingLeft: '16px' }}> */}
+                            <PreviewGif />
+                            {/* </Grid> */}
+                        </Grid>
+                    )}
                 </TabPanel>
                 <TabPanel value={tabValue} index={1}>
                     <Typography color="textSecondary" className={classes.tabs}>

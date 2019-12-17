@@ -73,6 +73,7 @@ export const generateGif = props => {
             if (!obj.error) {
                 resolve(obj.image)
             } else {
+                alert(obj.errorMsg)
                 reject({ error: obj.error, errorCode: obj.errorCode, errorMsg: obj.errorMsg })
             }
         })

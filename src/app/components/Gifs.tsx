@@ -61,7 +61,7 @@ const Gifs = () => {
         } else {
             openSnackbar({
                 message: 'No GIF to load',
-                action: [<img src={sadface} style={{ height: 100, width: 'auto' }}></img>],
+                action: [<img src={sadface} key="noGif" style={{ width: 80, borderRadius: 5, height: 'auto' }}></img>],
                 variant: 'warning',
                 autoHideDuration: 10000,
             })

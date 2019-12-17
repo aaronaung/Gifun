@@ -43,6 +43,7 @@
     "license": "MIT",
     "scripts": {
         "develop": "gatsby develop -H 0.0.0.0 -p 8001",
+        "develop:secure": "gatsby develop -H 0.0.0.0 -p 8001 --https",
         "start": "run-p start:**",
         "start:app": "npm run develop",
         "build": "run-p build:**",
