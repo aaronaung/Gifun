@@ -110,6 +110,18 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
             width: '100%',
             height: '50px',
+            zIndex: 10000,
+        },
+
+        addBtn: {
+            '&:hover .MuiListItemIcon-root': {
+                color: theme.colors.success,
+            },
+        },
+        favoriteBtn: {
+            '&:hover .MuiListItemIcon-root': {
+                color: theme.palette.secondary.main,
+            },
         },
     })
 )
@@ -176,7 +188,7 @@ export default function MiniDrawer({ children }) {
                 <Divider />
                 <List>
                     <Tooltip title={!open ? <Typography variant="subtitle2">My GIFs</Typography> : ''} placement="right">
-                        <ListItem button key={'My Gifs'} onClick={() => navigate('/app')}>
+                        <ListItem className={clsx(classes.favoriteBtn)} button key={'My Gifs'} onClick={() => navigate('/app')}>
                             <ListItemIcon style={{ paddingLeft: 8 }}>
                                 <FavoriteIcon />
                             </ListItemIcon>
@@ -185,7 +197,12 @@ export default function MiniDrawer({ children }) {
                     </Tooltip>
 
                     <Tooltip title={!open ? <Typography variant="subtitle2">Create GIFs</Typography> : ''} placement="right">
-                        <ListItem button key={'Create Gifs'} onClick={() => navigate('/app/create')}>
+                        <ListItem
+                            className={clsx(classes.addBtn)}
+                            button
+                            key={'Create Gifs'}
+                            onClick={() => navigate('/app/create')}
+                        >
                             <ListItemIcon style={{ paddingLeft: 8 }}>
                                 <AddBoxIcon />
                             </ListItemIcon>

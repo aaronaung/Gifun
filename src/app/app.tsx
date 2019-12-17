@@ -11,10 +11,25 @@ import { Provider as ReduxProvider } from 'react-redux'
 import store from './redux/root.store'
 import { CameraProvider } from './contexts/CameraContext.tsx'
 import { SnackbarProvider } from './contexts/SnackbarContext'
+import { red, green, yellow, blue, grey } from '@material-ui/core/colors'
 
 const theme = createMuiTheme({
     palette: {
         type: 'dark',
+    },
+    colors: {
+        danger: red[500],
+        success: green[400],
+        warning: yellow[800],
+        info: blue[500],
+        default: grey[300],
+    },
+    overrides: {
+        MuiSvgIcon: {
+            root: {
+                transition: 'color ease 0.5s',
+            },
+        },
     },
 })
 

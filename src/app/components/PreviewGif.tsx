@@ -39,6 +39,7 @@ import { removePreview, pendingPreview, newPreview } from '../redux/preview/prev
 import { useCameraContext } from '../contexts/CameraContext'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
 import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
+import clsx from 'clsx'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -49,8 +50,13 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         alignItems: 'center',
     },
-    actionBtns: {
-        minWidth: '30px',
+    actionBtn: {
+        minWidth: '35px',
+        cursor: 'pointer',
+        '& .MuiSvgIcon-root': {
+            fontSize: 30,
+            color: theme.colors.default,
+        },
     },
     previewSkeleton: {
         border: 'grey solid 1px',
@@ -94,6 +100,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     startGiffing: {
         color: theme,
+    },
+    downloadBtn: {
+        '&:hover .MuiSvgIcon-root': {
+            color: `${theme.colors.success} !important`,
+        },
+    },
+    cancelBtn: {
+        '&:hover .MuiSvgIcon-root': {
+            color: `${theme.colors.danger} !important`,
+        },
+    },
+    favoriteBtn: {
+        '&:hover .MuiSvgIcon-root': {
+            color: `${theme.palette.secondary.main} !important`,
+        },
     },
 }))
 
@@ -149,7 +170,7 @@ function MediaCard({ gifProperties, gifB64 }) {
                             disabled={saving}
                             size="medium"
                             style={{ color: '#66bb6a' }}
-                            className={classes.actionBtns}
+                            className={clsx(classes.actionBtn, classes.downloadBtn)}
                         >
                             <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
                         </Button>
@@ -163,7 +184,7 @@ function MediaCard({ gifProperties, gifB64 }) {
                             size="medium"
                             style={{ color: '#ec407a' }}
                             onClick={handleSavePreview}
-                            className={classes.actionBtns}
+                            className={clsx(classes.actionBtn, classes.favoriteBtn)}
                         >
                             <FavoriteTwoTone color={saving ? 'disabled' : 'inherit'} fontSize="default" />
                         </Button>
@@ -176,7 +197,7 @@ function MediaCard({ gifProperties, gifB64 }) {
                             disabled={saving}
                             size="medium"
                             style={{ color: '#d32f2f' }}
-                            className={classes.actionBtns}
+                            className={clsx(classes.actionBtn, classes.cancelBtn)}
                             onClick={handleRemovePreview}
                         >
                             <CancelIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
@@ -295,7 +316,13 @@ const PreviewGif = () => {
                     gifHeight: webcamRef.current.video.videoHeight,
                     gifWidth: webcamRef.current.video.videoWidth,
                 }
-                let b64 = await generateGif(newProps)
+                try {
+                    let b64 = await generateGif(newProps)
+                } catch (err) {
+                    alert(err)
+                    alert(err.message)
+                }
+
                 setPreviewState({ counting: false, recording: false, processing: false })
                 dispatch(newPreview({ b64, properties: formValues }))
             }, COUNTER_INTERVAL * 3)
@@ -322,8 +349,9 @@ const PreviewGif = () => {
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}
                         label={<Typography color="textSecondary">Show text placement</Typography>}
                     ></FormControlLabel>
-                    <Tooltip title="Important Note">
+                    <Tooltip title={<Typography variant="subtitle2">Note</Typography>}>
                         <InfoIcon
+                            className={classes.test}
                             color="disabled"
                             onClick={() => setOpenDialog(true)}
                             style={{ marginLeft: 'auto', cursor: 'pointer' }}

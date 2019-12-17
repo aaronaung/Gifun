@@ -32,6 +32,7 @@ import AssignmentIcon from '@material-ui/icons/Assignment'
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn'
 import * as _ from 'lodash'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
+import clsx from 'clsx'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -54,8 +55,13 @@ const useStyles = makeStyles((theme: Theme) =>
             background: theme.palette.grey[900],
         },
         actionBtn: {
-            fontSize: 30,
+            height: 45,
             cursor: 'pointer',
+            padding: 0,
+            '& .MuiSvgIcon-root': {
+                fontSize: 30,
+                color: theme.colors.default,
+            },
         },
         deleting: {
             opacity: 0.3,
@@ -65,6 +71,21 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         copyBoard: {
             // width: 'fit-content',
+        },
+        downloadBtn: {
+            '&:hover .MuiSvgIcon-root': {
+                color: `${theme.colors.success} !important`,
+            },
+        },
+        deleteBtn: {
+            '&:hover .MuiSvgIcon-root': {
+                color: `${theme.colors.danger} !important`,
+            },
+        },
+        shareBtn: {
+            '&:hover .MuiSvgIcon-root': {
+                color: `white !important`,
+            },
         },
     })
 )
@@ -190,28 +211,30 @@ export default function GifLightBox({ gif, open, setOpen, setGifs }) {
                                 href={(gif && gif.b64) || ''}
                                 style={{ textDecoration: 'none' }}
                             >
-                                <Button className={classes.actionBtn}>
-                                    <DownloadIcon style={{ color: '#66bb6a' }} fontSize="large"></DownloadIcon>
+                                <Button className={clsx(classes.actionBtn, classes.downloadBtn)}>
+                                    <DownloadIcon></DownloadIcon>
                                 </Button>
                             </a>
                         </Tooltip>
                         <Tooltip title={<Typography variant="subtitle2">Delete</Typography>}>
                             <span>
-                                <Button onClick={handleDelete} className={classes.actionBtn} disabled={deleting}>
-                                    <DeleteIcon
-                                        style={{ color: `${!deleting ? '#d32f2f' : 'grey'}` }}
-                                        fontSize="large"
-                                    ></DeleteIcon>
+                                <Button
+                                    onClick={handleDelete}
+                                    className={clsx(classes.actionBtn, classes.deleteBtn)}
+                                    disabled={deleting}
+                                >
+                                    <DeleteIcon></DeleteIcon>
                                 </Button>
                             </span>
                         </Tooltip>
                         <Tooltip title={<Typography variant="subtitle2">Share</Typography>}>
                             <span>
-                                <Button onClick={handleShare} className={classes.actionBtn} disabled={deleting}>
-                                    <ShareIcon
-                                        style={{ color: `${!deleting ? 'rgb(253, 102, 136)' : 'grey'}` }}
-                                        fontSize="large"
-                                    ></ShareIcon>
+                                <Button
+                                    onClick={handleShare}
+                                    className={clsx(classes.actionBtn, classes.shareBtn)}
+                                    disabled={deleting}
+                                >
+                                    <ShareIcon></ShareIcon>
                                 </Button>
                             </span>
                         </Tooltip>

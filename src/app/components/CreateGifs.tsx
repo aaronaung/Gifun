@@ -76,10 +76,12 @@ const CreateGifs = () => {
     return (
         <Grid container spacing={3} className={classes.main}>
             <Grid item xs={12} lg={12}>
+                {/* 
+                move this to the header possibly when you have multiple
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example" className={classes.tabs}>
                     <Tab label="Webcam" {...a11yProps(0)} />
                     <Tab label="Video" {...a11yProps(1)} />
-                </Tabs>
+                </Tabs> */}
                 <TabPanel value={tabValue} index={0}>
                     <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
                         <Grid item xs={12} md={7} lg={7} style={{ marginBottom: '25px' }}>

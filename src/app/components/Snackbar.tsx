@@ -14,6 +14,9 @@ import clsx from 'clsx'
 import { SnackbarContent, Typography } from '@material-ui/core'
 
 const useStyles = makeStyles((theme: Theme) => ({
+    root: {
+        zIndex: 10001,
+    },
     close: {
         padding: theme.spacing(0.5),
         color: 'white',
@@ -69,6 +72,7 @@ export default function SimpleSnackbar() {
                 open={isOpen}
                 autoHideDuration={snackbarProps.autoHideDuration}
                 onClose={handleClose}
+                className={clsx(classes.root)}
             >
                 <SnackbarContent
                     action={[

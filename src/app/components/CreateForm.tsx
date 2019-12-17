@@ -232,7 +232,7 @@ const CreateForm = () => {
                                 <InputAdornment style={{ marginRight: '10px' }} position="end">
                                     px
                                 </InputAdornment>
-                                <Tooltip title="Center Horizontally">
+                                <Tooltip title={<Typography variant="subtitle2">Center Horizontally</Typography>}>
                                     <VerticalAlignCenterIcon
                                         style={{ cursor: 'pointer', transform: 'rotate(90deg)' }}
                                         color="secondary"
@@ -271,7 +271,7 @@ const CreateForm = () => {
                                 <InputAdornment style={{ marginRight: '10px' }} position="end">
                                     px
                                 </InputAdornment>
-                                <Tooltip title="Center Vertically">
+                                <Tooltip title={<Typography variant="subtitle2">Center Vertically</Typography>}>
                                     <VerticalAlignCenterIcon
                                         style={{ cursor: 'pointer' }}
                                         color="secondary"
