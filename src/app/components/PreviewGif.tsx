@@ -320,7 +320,7 @@ const PreviewGif = () => {
                     let b64 = await generateGif(newProps)
                 } catch (err) {
                     alert(err)
-                    alert(err.message)
+                    alert(JSON.stringify(err))
                 }
 
                 setPreviewState({ counting: false, recording: false, processing: false })
