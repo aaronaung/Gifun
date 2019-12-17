@@ -73,7 +73,6 @@ export const generateGif = props => {
             if (!obj.error) {
                 resolve(obj.image)
             } else {
-                alert(obj.errorMsg)
                 reject({ error: obj.error, errorCode: obj.errorCode, errorMsg: obj.errorMsg })
             }
         })
@@ -90,7 +89,7 @@ export const uploadGifForUser = async (props, b64: string, userId: any): Promise
         let gifId = uuid()
         let gifBlob = b64ToBlob(b64)
         let gaiaHubUrl = getGaiaHubUrl()
-        let htmlText = constructHTMLSharable(b64, `${gaiaHubUrl}/${GIFS_PATH}/${gifId}/blob`)
+        let shareableLink = `${gaiaHubUrl}/${GIFS_PATH}/${gifId}/blob`
         let userGifs = await getUserGIFIds(userId)
         userGifs.push(gifId)
 
@@ -101,7 +100,7 @@ export const uploadGifForUser = async (props, b64: string, userId: any): Promise
         // let uploadShareableHTML = putFile(`${GIFS_PATH}/${gifId}/shared`, htmlText, { contentType: 'text/html', encrypt: false })
 
         await Promise.all([uploadGifProps, uploadGifB64, updateGifList, uploadGifBlob])
-        return { id: gifId, ...props, b64 }
+        return { id: gifId, b64, shareableLink, ...props }
     } catch (err) {
         console.log(err)
         return error(err.message)

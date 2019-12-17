@@ -1,7 +1,9 @@
-import { NEW_PREVIEW, REMOVE_PREVIEW, PENDING_PREVIEW } from './preview.action'
+import { NEW_PREVIEW, REMOVE_PREVIEW, PENDING_PREVIEW, MARK_PREVIEW_SAVED } from './preview.action'
 
 const INITIAL_STATE = {
     b64: '',
+    saved: false,
+    shareableLink: '',
 }
 const PreviewReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
@@ -13,14 +15,21 @@ const PreviewReducer = (state = INITIAL_STATE, action) => {
             }
         case REMOVE_PREVIEW:
             return {
-                ...state,
                 b64: null,
                 properties: null,
+                saved: false,
+                shareableLink: '',
             }
         case PENDING_PREVIEW:
             return {
                 ...state,
                 pending: action.payload,
+            }
+        case MARK_PREVIEW_SAVED:
+            return {
+                ...state,
+                saved: action.payload.saved,
+                shareableLink: action.payload.shareableLink,
             }
         default:
             return {

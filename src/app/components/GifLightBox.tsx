@@ -94,7 +94,7 @@ const Transition = React.forwardRef<unknown, TransitionProps>(function Transitio
     return <Slide direction="up" ref={ref} {...props} />
 })
 
-const CopyBoard = function({ open, setOpen, shareableLink }) {
+export const CopyBoard = function({ open, setOpen, shareableLink }) {
     const classes = useStyles()
     const linkRef = useRef(null)
     const [copied, setCopied] = useState(false)

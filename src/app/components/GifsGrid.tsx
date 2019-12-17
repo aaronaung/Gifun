@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         transform: 'translate(-50%,-50%)',
         textAlign: 'center',
         display: 'flex',
+        alignItems: 'center',
         [theme.breakpoints.down('sm')]: {
             flexDirection: 'column',
         },
@@ -87,7 +88,7 @@ export default function GifsGrid({ datedGifs, setDatedGifs, loading }) {
             <GifLightBox open={openLightBox} setOpen={setOpenLightBox} gif={lightBoxGif} setGifs={setDatedGifs}></GifLightBox>
             {loading ? (
                 <div className={classes.centerItems}>
-                    <CircularProgress style={{ marginBottom: 10 }}></CircularProgress>
+                    <CircularProgress style={{ marginRight: 10 }}></CircularProgress>
                     <Typography>Loading GIFs...</Typography>
                 </div>
             ) : (

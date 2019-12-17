@@ -14,6 +14,7 @@ import {
     DialogContentText,
     DialogContent,
     Divider,
+    Theme,
 } from '@material-ui/core'
 import { useSelector, useDispatch } from 'react-redux'
 import { previewSelector } from '../redux/preview/preview.selector'
@@ -35,11 +36,13 @@ import { uploadGifForUser, generateGif } from '../services/gif.service'
 import { addGifs } from '../redux/gifs/gifs.action'
 import Webcam from 'react-webcam'
 import { formSelector } from '../redux/form/form.selector'
-import { removePreview, pendingPreview, newPreview } from '../redux/preview/preview.action'
+import { removePreview, pendingPreview, newPreview, setSaved } from '../redux/preview/preview.action'
 import { useCameraContext } from '../contexts/CameraContext'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
 import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
+import ShareIcon from '@material-ui/icons/Share'
 import clsx from 'clsx'
+import { CopyBoard } from './GifLightBox'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -99,7 +102,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         fontSize: '25px',
     },
     startGiffing: {
-        color: theme,
+        color: theme.palette.secondary.main,
     },
     downloadBtn: {
         '&:hover .MuiSvgIcon-root': {
@@ -116,6 +119,22 @@ const useStyles = makeStyles((theme: Theme) => ({
             color: `${theme.palette.secondary.main} !important`,
         },
     },
+    savingOverlay: {
+        opacity: 0.2,
+    },
+    savingLoader: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%)',
+        color: theme.palette.secondary.main,
+        animation: 'none',
+    },
+    shareBtn: {
+        '&:hover .MuiSvgIcon-root': {
+            color: `white !important`,
+        },
+    },
 }))
 
 const COUNTER_INTERVAL = 800
@@ -125,17 +144,22 @@ const PREVIEW_GUIDE = [
 ]
 
 function MediaCard({ gifProperties, gifB64 }) {
-    const classes = useStyles()
     const { gifHeight, gifWidth } = gifProperties
+    const classes = useStyles()
+
     const [saving, setSaving] = useState(false)
+    const [openShareModal, setOpenShareModal] = useState(false)
     const [cameraState, setCameraState] = useCameraContext()
+
     const { identityAddress: userId } = getUser()
     const { openSnackbar } = useSnackbarContext()
     const dispatch = useDispatch()
+    const { saved, shareableLink } = useSelector(state => previewSelector(state))
 
     const handleSavePreview = useCallback(async () => {
         setSaving(true)
         let resp = await uploadGifForUser(gifProperties, gifB64, userId)
+        dispatch(setSaved(true, resp.shareableLink))
         openSnackbar({
             message: 'Save successful',
             action: [
@@ -157,55 +181,85 @@ function MediaCard({ gifProperties, gifB64 }) {
     })
 
     return (
-        <Card style={{ minWidth: '200px', width: `${gifWidth}px` }}>
-            <CardActionArea>
-                <CardMedia image={gifB64} title="Gifun Preview" style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }} />
-            </CardActionArea>
+        <>
+            <CopyBoard open={openShareModal} setOpen={setOpenShareModal} shareableLink={shareableLink}></CopyBoard>
+            <Card style={{ minWidth: '200px', width: `${gifWidth}px` }}>
+                <CardActionArea>
+                    {saving ? <CircularProgress className={clsx(classes.savingLoader)}></CircularProgress> : ''}
+                    <CardMedia
+                        className={clsx(saving ? classes.savingOverlay : '')}
+                        image={gifB64}
+                        title="Gifun Preview"
+                        style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }}
+                    />
+                </CardActionArea>
 
-            <CardActions style={{ justifyContent: 'space-around' }}>
-                <Tooltip title={<Typography variant="subtitle2">Download</Typography>}>
-                    <a download="gifun-preview.gif" href={gifB64} style={{ textDecoration: 'none' }}>
-                        <Button
-                            onClick={() => openSnackbar({ message: 'Download successful', variant: 'success' })}
-                            disabled={saving}
-                            size="medium"
-                            style={{ color: '#66bb6a' }}
-                            className={clsx(classes.actionBtn, classes.downloadBtn)}
-                        >
-                            <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
-                        </Button>
-                    </a>
-                </Tooltip>
+                <CardActions style={{ justifyContent: 'space-around' }}>
+                    <Tooltip title={<Typography variant="subtitle2">{!saving ? `Download` : `Saving ...`}</Typography>}>
+                        <a download="gifun-preview.gif" href={gifB64} style={{ textDecoration: 'none' }}>
+                            <Button
+                                onClick={() => openSnackbar({ message: 'Download successful', variant: 'success' })}
+                                disabled={saving}
+                                size="medium"
+                                className={clsx(classes.actionBtn, classes.downloadBtn)}
+                            >
+                                <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} />
+                            </Button>
+                        </a>
+                    </Tooltip>
 
-                <Tooltip title={<Typography variant="subtitle2">Save</Typography>}>
-                    <span>
-                        <Button
-                            disabled={saving}
-                            size="medium"
-                            style={{ color: '#ec407a' }}
-                            onClick={handleSavePreview}
-                            className={clsx(classes.actionBtn, classes.favoriteBtn)}
-                        >
-                            <FavoriteTwoTone color={saving ? 'disabled' : 'inherit'} fontSize="default" />
-                        </Button>
-                    </span>
-                </Tooltip>
+                    {!saved ? (
+                        <Tooltip title={<Typography variant="subtitle2">{!saving ? `Save` : `Processing ...`}</Typography>}>
+                            <span>
+                                <Button
+                                    disabled={saving}
+                                    size="medium"
+                                    onClick={handleSavePreview}
+                                    className={clsx(classes.actionBtn, classes.favoriteBtn)}
+                                >
+                                    <FavoriteTwoTone color={saving ? 'disabled' : 'inherit'} />
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    ) : (
+                        ''
+                    )}
 
-                <Tooltip title={<Typography variant="subtitle2">Cancel</Typography>}>
-                    <span>
-                        <Button
-                            disabled={saving}
-                            size="medium"
-                            style={{ color: '#d32f2f' }}
-                            className={clsx(classes.actionBtn, classes.cancelBtn)}
-                            onClick={handleRemovePreview}
-                        >
-                            <CancelIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
-                        </Button>
-                    </span>
-                </Tooltip>
-            </CardActions>
-        </Card>
+                    {saved ? (
+                        <Tooltip title={<Typography variant="subtitle2">{!saving ? `Share` : `Processing ...`}</Typography>}>
+                            <span>
+                                <Button
+                                    disabled={saving}
+                                    size="medium"
+                                    onClick={() => {
+                                        setOpenShareModal(true)
+                                    }}
+                                    className={clsx(classes.actionBtn, classes.shareBtn)}
+                                >
+                                    <ShareIcon color={saving ? 'disabled' : 'inherit'}></ShareIcon>
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    ) : (
+                        ''
+                    )}
+
+                    <Tooltip title={<Typography variant="subtitle2">{!saving ? `Cancel` : `Processing ...`}</Typography>}>
+                        <span>
+                            <Button
+                                disabled={saving}
+                                size="medium"
+                                style={{ color: '#d32f2f' }}
+                                className={clsx(classes.actionBtn, classes.cancelBtn)}
+                                onClick={handleRemovePreview}
+                            >
+                                <CancelIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
+                            </Button>
+                        </span>
+                    </Tooltip>
+                </CardActions>
+            </Card>
+        </>
     )
 }
 
@@ -323,9 +377,9 @@ const PreviewGif = () => {
 
             setTimeout(() => {
                 /** after the gif capture time is over and gif is still processing */
-                // if (previewState.processing === false && !b64) {
-                //     setPreviewState({ counting: false, recording: false, processing: true })
-                // }
+                if (previewState.processing === false && !b64) {
+                    setPreviewState({ counting: false, recording: false, processing: true })
+                }
                 dispatch(pendingPreview(false))
                 openSnackbar({ message: 'Preview ready', variant: 'info' })
             }, COUNTER_INTERVAL * 6)
@@ -429,10 +483,6 @@ const PreviewGif = () => {
                         )}
                     </div>
                 )}
-
-                {/* {camSize && webcamRef.current ? `${webcamRef.current.video.videoWidth}` : 'CAM NOT READY'} */}
-
-                {/* <PreviewGif /> */}
             </div>
         </div>
     )

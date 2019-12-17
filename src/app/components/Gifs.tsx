@@ -15,6 +15,7 @@ const Gifs = () => {
     const [datedGifs, setDatedGifs] = useState({}) /** sorted by date */
     const [loading, setLoading] = useState(false)
     const { openSnackbar } = useSnackbarContext()
+    let subscription = null
 
     const fetchUserGifs = async () => {
         setLoading(true)
@@ -38,8 +39,7 @@ const Gifs = () => {
                     })
                 }
             }
-
-            resp.$getGifs.subscribe({
+            subscription = resp.$getGifs.subscribe({
                 next: gif => {
                     if (gif.createdAt) {
                         /** Back fill b64s in the dated Gifs map */
@@ -70,6 +70,11 @@ const Gifs = () => {
 
     useEffect(() => {
         fetchUserGifs()
+        return () => {
+            if (subscription) {
+                subscription.unsubscribe()
+            }
+        }
     }, [])
 
     return <GifsGrid datedGifs={datedGifs} setDatedGifs={setDatedGifs} loading={loading} />

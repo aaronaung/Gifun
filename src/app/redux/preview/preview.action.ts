@@ -1,6 +1,7 @@
 export const NEW_PREVIEW = 'NEW_PREVIEW'
 export const REMOVE_PREVIEW = 'NEW_PREVIEW'
 export const PENDING_PREVIEW = 'PENDING_PREVIEW'
+export const MARK_PREVIEW_SAVED = 'MARK_PREVIEW_SAVED'
 
 export const pendingPreview = pending => {
     return {
@@ -19,5 +20,12 @@ export const removePreview = () => {
     return {
         type: REMOVE_PREVIEW,
         payload: '',
+    }
+}
+
+export const setSaved = (saved, shareableLink) => {
+    return {
+        type: MARK_PREVIEW_SAVED,
+        payload: { saved, shareableLink },
     }
 }
