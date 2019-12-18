@@ -28,6 +28,9 @@ import { CameraProvider, useCameraContext } from '../contexts/CameraContext'
 import { isMobile } from 'react-device-detect'
 import sorry from '../../images/sorry.gif'
 import clsx from 'clsx'
+import { useTabContext } from '../contexts/TabContext'
+import DropzoneDialogExample from './Dropzone'
+import MyDropzone from './Dropzone'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -71,12 +74,12 @@ function TabPanel(props: TabPanelProps) {
     )
 }
 
-const CreateGifs = () => {
+const CreateGifs = props => {
     const classes = useStyles()
     const dispatch = useDispatch()
-
+    console.log(props)
     /** State variables */
-    const [tabValue, setTabValue] = useState(0)
+    const { tabState, setTabState } = useTabContext()
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabValue(newValue)
@@ -90,7 +93,7 @@ const CreateGifs = () => {
                     <Tab label="Webcam" {...a11yProps(0)} />
                     <Tab label="Video" {...a11yProps(1)} />
                 </Tabs> */}
-                <TabPanel value={tabValue} index={0}>
+                <TabPanel value={tabState} index={0}>
                     {isMobile ? (
                         <>
                             <Typography>
@@ -111,7 +114,10 @@ const CreateGifs = () => {
                         </Grid>
                     )}
                 </TabPanel>
-                <TabPanel value={tabValue} index={1}>
+                <TabPanel value={tabState} index={1}>
+                    <MyDropzone></MyDropzone>
+                </TabPanel>
+                <TabPanel value={tabState} index={2}>
                     <Typography color="textSecondary" className={classes.tabs}>
                         Coming soon...
                     </Typography>

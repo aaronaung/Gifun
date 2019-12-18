@@ -21,9 +21,11 @@ import GifIcon from '@material-ui/icons/Gif'
 import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
 import { navigate } from 'gatsby'
 import gifunLogo from '../../images/gifun.png'
-import { Tooltip } from '@material-ui/core'
+import { Tooltip, Tabs, Tab } from '@material-ui/core'
 import SimpleSnackbar from '../components/Snackbar'
 import { isMobile } from 'react-device-detect'
+import { useTabContext } from '../contexts/TabContext'
+import { Match } from '@reach/router'
 
 const drawerWidth = 240
 
@@ -53,6 +55,7 @@ const useStyles = makeStyles((theme: Theme) =>
             [theme.breakpoints.down('sm')]: {
                 marginRight: 10,
             },
+            zIndex: 1,
         },
         hide: {
             display: 'none',
@@ -125,13 +128,34 @@ const useStyles = makeStyles((theme: Theme) =>
                 color: theme.palette.secondary.main,
             },
         },
+        tabs: {
+            position: 'absolute',
+            width: '100%',
+            '& .MuiTabs-flexContainer': {
+                justifyContent: 'center',
+            },
+            '& .MuiTabs-indicator': {
+                display: 'none',
+            },
+            '& .MuiTab-root.Mui-selected': {
+                borderBottom: `${theme.palette.secondary.main} solid 1.5px`,
+            },
+        },
     })
 )
+
+function a11yProps(index: any) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    }
+}
 
 export default function MiniDrawer({ children }) {
     const classes = useStyles()
     const theme = useTheme()
     const [open, setOpen] = React.useState(false)
+    const { tabState, setTabState } = useTabContext()
 
     const handleDrawerOpen = () => {
         setOpen(true)
@@ -139,6 +163,10 @@ export default function MiniDrawer({ children }) {
 
     const handleDrawerClose = () => {
         setOpen(false)
+    }
+
+    const handleTabChange = (event, newState) => {
+        setTabState(newState)
     }
 
     return (
@@ -166,6 +194,25 @@ export default function MiniDrawer({ children }) {
                     <Typography variant="h6" color="secondary" noWrap>
                         <b>GIFun</b>
                     </Typography>
+
+                    {/* move this to the header possibly when you have multiple */}
+                    <Match path="/app/create">
+                        {props =>
+                            props.match && (
+                                <Tabs
+                                    variant="standard"
+                                    value={tabState}
+                                    onChange={handleTabChange}
+                                    aria-label="simple tabs example"
+                                    className={classes.tabs}
+                                >
+                                    <Tab label="Webcam" {...a11yProps(0)} />
+                                    <Tab label="Images" {...a11yProps(1)} />
+                                    <Tab label="Video" {...a11yProps(2)} />
+                                </Tabs>
+                            )
+                        }
+                    </Match>
                 </Toolbar>
             </AppBar>
             <Drawer

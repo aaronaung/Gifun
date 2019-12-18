@@ -12,6 +12,7 @@ import store from './redux/root.store'
 import { CameraProvider } from './contexts/CameraContext.tsx'
 import { SnackbarProvider } from './contexts/SnackbarContext'
 import { red, green, yellow, blue, grey } from '@material-ui/core/colors'
+import { TabProvider } from './contexts/TabContext'
 
 const theme = createMuiTheme({
     palette: {
@@ -38,15 +39,17 @@ const App = () => {
         <ReduxProvider store={store}>
             <ThemeProvider theme={theme}>
                 <SnackbarProvider>
-                    <CameraProvider>
-                        <Layout>
-                            <Router>
-                                <PrivateRoute path="/app" component={Gifs} />
-                                <PublicRoute path="/app/create" component={CreateGifs} />
-                                <PrivateRoute path="/" default={true} component={NotFound} />
-                            </Router>
-                        </Layout>
-                    </CameraProvider>
+                    <TabProvider>
+                        <CameraProvider>
+                            <Layout>
+                                <Router>
+                                    <PrivateRoute path="/app" component={Gifs} />
+                                    <PublicRoute path="/app/create" component={CreateGifs} />
+                                    <PrivateRoute path="/" default={true} component={NotFound} />
+                                </Router>
+                            </Layout>
+                        </CameraProvider>
+                    </TabProvider>
                 </SnackbarProvider>
             </ThemeProvider>
         </ReduxProvider>
