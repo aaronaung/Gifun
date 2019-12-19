@@ -1,48 +1,29 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react'
 import {
-    Typography,
     CircularProgress,
-    Badge,
-    Tooltip,
+    Dialog,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControlLabel,
     Switch,
-    Popover,
-    Dialog,
-    DialogTitle,
-    List,
-    ListItem,
-    DialogContentText,
-    DialogContent,
-    Divider,
     Theme,
+    Tooltip,
+    Typography,
 } from '@material-ui/core'
-import { useSelector, useDispatch } from 'react-redux'
-import { previewSelector } from '../redux/preview/preview.selector'
-import { makeStyles } from '@material-ui/styles'
-import { navigate } from 'gatsby'
-import defaultGif from '../../images/look-left.gif'
-import Card from '@material-ui/core/Card'
-import CardActionArea from '@material-ui/core/CardActionArea'
-import CardActions from '@material-ui/core/CardActions'
-import CardContent from '@material-ui/core/CardContent'
-import CardMedia from '@material-ui/core/CardMedia'
 import Button from '@material-ui/core/Button'
-import CloudDownloadIcon from '@material-ui/icons/CloudDownloadTwoTone'
-import FavoriteTwoTone from '@material-ui/icons/FavoriteTwoTone'
-import CancelIcon from '@material-ui/icons/CancelTwoTone'
 import InfoIcon from '@material-ui/icons/Info'
-import { getUser } from '../services/auth'
-import { uploadGifForUser, generateGif } from '../services/gif.service'
-import { addGifs } from '../redux/gifs/gifs.action'
+import { makeStyles } from '@material-ui/styles'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Webcam from 'react-webcam'
-import { formSelector } from '../redux/form/form.selector'
-import { removePreview, pendingPreview, newPreview, setSaved } from '../redux/preview/preview.action'
 import { useCameraContext } from '../contexts/CameraContext'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
-import FavoriteIcon from '@material-ui/icons/FavoriteOutlined'
-import ShareIcon from '@material-ui/icons/Share'
-import clsx from 'clsx'
-import { CopyBoard } from './GifLightBox'
+import { formSelector } from '../redux/form/form.selector'
+import { newPreview, pendingPreview } from '../redux/preview/preview.action'
+import { previewSelector } from '../redux/preview/preview.selector'
+import { generateGif } from '../services/gif.service'
+import PreviewCard from './PreviewCard'
+import Loading from './Loader'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -83,16 +64,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderTopRightRadius: '0px',
         height: '49px',
     },
-    loadingOverlay: {
-        border: 'grey solid 1px',
-        borderStyle: 'dashed',
-        background: '#272727',
-        display: 'flex',
-        position: 'absolute',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-    },
+
     counterOverlay: {
         display: 'flex',
         position: 'absolute',
@@ -142,137 +114,6 @@ const PREVIEW_GUIDE = [
     `Preview text placement by toggling the "Show text placement" switch.`,
     `Customize text placement by changing "Text Placement" to "Custom". `,
 ]
-
-function MediaCard({ gifProperties, gifB64 }) {
-    const { gifHeight, gifWidth } = gifProperties
-    const classes = useStyles()
-
-    const [saving, setSaving] = useState(false)
-    const [openShareModal, setOpenShareModal] = useState(false)
-    const [cameraState, setCameraState] = useCameraContext()
-
-    const { identityAddress: userId } = getUser()
-    const { openSnackbar } = useSnackbarContext()
-    const dispatch = useDispatch()
-    const { saved, shareableLink } = useSelector(state => previewSelector(state))
-
-    const handleSavePreview = useCallback(async () => {
-        setSaving(true)
-        let resp = await uploadGifForUser(gifProperties, gifB64, userId)
-        dispatch(setSaved(true, resp.shareableLink))
-        openSnackbar({
-            message: 'Save successful',
-            action: [
-                <Tooltip
-                    key="checkitout"
-                    style={{ cursor: 'pointer', color: 'white' }}
-                    title={<Typography variant="subtitle1">See it in your favorite list</Typography>}
-                >
-                    <FavoriteIcon key="undo" color="secondary" size="small" onClick={() => navigate('/app')}></FavoriteIcon>
-                </Tooltip>,
-            ],
-        })
-        setSaving(false)
-    }, [])
-
-    const handleRemovePreview = useCallback(() => {
-        setCameraState({ on: false, loading: true })
-        dispatch(removePreview())
-    })
-
-    return (
-        <>
-            <CopyBoard open={openShareModal} setOpen={setOpenShareModal} shareableLink={shareableLink}></CopyBoard>
-            <Card style={{ minWidth: '200px', width: `${gifWidth}px` }}>
-                <CardActionArea>
-                    {saving ? <CircularProgress className={clsx(classes.savingLoader)}></CircularProgress> : ''}
-                    <CardMedia
-                        className={clsx(saving ? classes.savingOverlay : '')}
-                        image={gifB64}
-                        title="Gifun Preview"
-                        style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }}
-                    />
-                </CardActionArea>
-
-                <CardActions style={{ justifyContent: 'space-around' }}>
-                    <Tooltip title={<Typography variant="subtitle2">{!saving ? `Download` : `Saving ...`}</Typography>}>
-                        <a download="gifun-preview.gif" href={gifB64} style={{ textDecoration: 'none' }}>
-                            <Button
-                                onClick={() => openSnackbar({ message: 'Download successful', variant: 'success' })}
-                                disabled={saving}
-                                size="medium"
-                                className={clsx(classes.actionBtn, classes.downloadBtn)}
-                            >
-                                <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} />
-                            </Button>
-                        </a>
-                    </Tooltip>
-
-                    {!saved ? (
-                        <Tooltip title={<Typography variant="subtitle2">{!saving ? `Save` : `Processing ...`}</Typography>}>
-                            <span>
-                                <Button
-                                    disabled={saving}
-                                    size="medium"
-                                    onClick={handleSavePreview}
-                                    className={clsx(classes.actionBtn, classes.favoriteBtn)}
-                                >
-                                    <FavoriteTwoTone color={saving ? 'disabled' : 'inherit'} />
-                                </Button>
-                            </span>
-                        </Tooltip>
-                    ) : (
-                        ''
-                    )}
-
-                    {saved ? (
-                        <Tooltip title={<Typography variant="subtitle2">{!saving ? `Share` : `Processing ...`}</Typography>}>
-                            <span>
-                                <Button
-                                    disabled={saving}
-                                    size="medium"
-                                    onClick={() => {
-                                        setOpenShareModal(true)
-                                    }}
-                                    className={clsx(classes.actionBtn, classes.shareBtn)}
-                                >
-                                    <ShareIcon color={saving ? 'disabled' : 'inherit'}></ShareIcon>
-                                </Button>
-                            </span>
-                        </Tooltip>
-                    ) : (
-                        ''
-                    )}
-
-                    <Tooltip title={<Typography variant="subtitle2">{!saving ? `Cancel` : `Processing ...`}</Typography>}>
-                        <span>
-                            <Button
-                                disabled={saving}
-                                size="medium"
-                                style={{ color: '#d32f2f' }}
-                                className={clsx(classes.actionBtn, classes.cancelBtn)}
-                                onClick={handleRemovePreview}
-                            >
-                                <CancelIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
-                            </Button>
-                        </span>
-                    </Tooltip>
-                </CardActions>
-            </Card>
-        </>
-    )
-}
-
-const Loading = ({ width, height }) => {
-    width = width || 300
-    height = height || 300
-    const classes = useStyles()
-    return (
-        <div className={classes.loadingOverlay} style={{ width, height }}>
-            <CircularProgress></CircularProgress>
-        </div>
-    )
-}
 
 function PreviewGuideDialog({ open, setOpen }) {
     const classes = useStyles()
@@ -442,7 +283,7 @@ const PreviewGif = () => {
                 )}
                 {b64 && !pending ? (
                     <div className={classes.videoContainer}>
-                        <MediaCard gifProperties={properties} gifB64={b64} />
+                        <PreviewCard gifProperties={properties} gifB64={b64} />
                     </div>
                 ) : (
                     <div className={classes.videoContainer}>

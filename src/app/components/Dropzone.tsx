@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react'
-import { useDropzone } from 'react-dropzone'
-import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import FileCopyIcon from '@material-ui/icons/FileCopy'
+import { makeStyles } from '@material-ui/styles'
+import React, { useCallback } from 'react'
+import { useDropzone } from 'react-dropzone'
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderStyle: 'dashed',
         background: theme.palette.grey[900],
         borderRadius: 5,
-        margin: '0 20%',
+        // margin: '0 20%',
         padding: 40,
         textAlign: 'center',
         cursor: 'pointer',
@@ -34,10 +34,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }))
 
-export default function MyDropzone() {
+export default function MyDropzone({ handleDrop }) {
     const classes = useStyles()
     const onDrop = useCallback(acceptedFiles => {
-        // Do something with the files
+        handleDrop(acceptedFiles)
     }, [])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 

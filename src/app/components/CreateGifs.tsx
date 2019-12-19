@@ -14,7 +14,7 @@ import {
     Switch,
 } from '@material-ui/core'
 import CreateForm from './CreateForm'
-import PreviewGif from './PreviewGif'
+import PreviewGif from './WebCamPreview'
 import { makeStyles } from '@material-ui/styles'
 import Webcam from 'react-webcam'
 import { formSelector } from '../redux/form/form.selector'
@@ -77,22 +77,23 @@ function TabPanel(props: TabPanelProps) {
 const CreateGifs = props => {
     const classes = useStyles()
     const dispatch = useDispatch()
-    console.log(props)
     /** State variables */
     const { tabState, setTabState } = useTabContext()
+    const [files, setFiles] = useState([])
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabValue(newValue)
     }
+
+    const handleDrop = droppedFiles => {
+        setFiles(files => {
+            return [...files, ...droppedFiles]
+        })
+    }
+
     return (
         <Grid container spacing={3} className={classes.main}>
             <Grid item xs={12} lg={12}>
-                {/* 
-                move this to the header possibly when you have multiple
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example" className={classes.tabs}>
-                    <Tab label="Webcam" {...a11yProps(0)} />
-                    <Tab label="Video" {...a11yProps(1)} />
-                </Tabs> */}
                 <TabPanel value={tabState} index={0}>
                     {isMobile ? (
                         <>
@@ -114,8 +115,10 @@ const CreateGifs = props => {
                         </Grid>
                     )}
                 </TabPanel>
-                <TabPanel value={tabState} index={1}>
-                    <MyDropzone></MyDropzone>
+                <TabPanel value={tabState} style={{ margin: '0 20%' }} index={1}>
+                    <MyDropzone handleDrop={handleDrop}></MyDropzone>
+                    {/* {JSON.stringify(files)} */}
+                    {/* <CreateForm></CreateForm> */}
                 </TabPanel>
                 <TabPanel value={tabState} index={2}>
                     <Typography color="textSecondary" className={classes.tabs}>

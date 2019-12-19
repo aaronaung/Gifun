@@ -1,26 +1,13 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react'
-import {
-    TextField,
-    makeStyles,
-    createStyles,
-    Theme,
-    FormControl,
-    MenuItem,
-    Divider,
-    FormGroup,
-    Typography,
-    Button,
-    InputAdornment,
-    Tooltip,
-} from '@material-ui/core'
+import { createStyles, InputAdornment, makeStyles, MenuItem, TextField, Theme, Tooltip, Typography } from '@material-ui/core'
 import VerticalAlignCenterIcon from '@material-ui/icons/VerticalAlignCenter'
 import { Autocomplete } from '@material-ui/lab'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { newPreview, pendingPreview } from '../redux/preview/preview.action'
-import { generateGif } from '../services/gif.service'
-import { previewSelector } from '../redux/preview/preview.selector'
+import { resetForm, setFormErrors, updateFormValues } from '../redux/form/form.action'
 import { formSelector } from '../redux/form/form.selector'
-import { updateFormValues, updateFormErrors, setFormErrors, resetForm } from '../redux/form/form.action'
+import { newPreview, pendingPreview } from '../redux/preview/preview.action'
+import { previewSelector } from '../redux/preview/preview.selector'
+import { generateGif } from '../services/gif.service'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
