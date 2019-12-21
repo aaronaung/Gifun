@@ -1,65 +1,20 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react'
-import {
-    Grid,
-    Tab,
-    Typography,
-    Box,
-    Tabs,
-    Theme,
-    Button,
-    CircularProgress,
-    Divider,
-    FormControl,
-    FormControlLabel,
-    Switch,
-} from '@material-ui/core'
-import CreateForm from './CreateForm'
-import PreviewGif from './WebCamPreview'
+import { Box, Grid, Theme, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import Webcam from 'react-webcam'
-import { formSelector } from '../redux/form/form.selector'
-import { useSelector, useDispatch } from 'react-redux'
-import { previewSelector } from '../redux/preview/preview.selector'
-import { flexbox } from '@material-ui/system'
-import { pendingPreview, newPreview, removePreview } from '../redux/preview/preview.action'
-import { generateGif, generateNewGif } from '../services/gif.service'
-import { after } from 'eol'
-import { CameraProvider, useCameraContext } from '../contexts/CameraContext'
-import { isMobile } from 'react-device-detect'
-import sorry from '../../images/sorry.gif'
 import clsx from 'clsx'
+import React, { useEffect, useRef, useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import { useDispatch, useSelector } from 'react-redux'
+import sorry from '../../images/sorry.gif'
 import { useTabContext } from '../contexts/TabContext'
-import DropzoneDialogExample from './Dropzone'
-import MyDropzone from './Dropzone'
-import Slider from 'react-flickity-component'
+import { formSelector } from '../redux/form/form.selector'
+import { newPreview, removePreview } from '../redux/preview/preview.action'
+import { previewSelector } from '../redux/preview/preview.selector'
+import { generateGif } from '../services/gif.service'
 import '../vendors/flickity.css'
-import TextPreview from './TextPreview'
+import CreateForm from './CreateForm'
+import MyDropzone from './Dropzone'
 import PreviewCard from './PreviewCard'
-import { throttle } from 'throttle-debounce'
-
-function fit(contains) {
-    return (parentWidth, parentHeight, childWidth, childHeight, scale = 1, offsetX = 0.5, offsetY = 0.5) => {
-        const childRatio = childWidth / childHeight
-        const parentRatio = parentWidth / parentHeight
-        let width = parentWidth * scale
-        let height = parentHeight * scale
-
-        if (contains ? childRatio > parentRatio : childRatio < parentRatio) {
-            height = width / childRatio
-        } else {
-            width = height * childRatio
-        }
-
-        return {
-            width,
-            height,
-            offsetX: (parentWidth - width) * offsetX,
-            offsetY: (parentHeight - height) * offsetY,
-        }
-    }
-}
-const contain = fit(true)
-const cover = fit(false)
+import PreviewGif from './WebCamPreview'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -130,8 +85,6 @@ const CreateGifs = props => {
     const [images, setImages] = useState([])
     const { formValues, formErrors } = useSelector(state => formSelector(state))
     const [showPreview, setShowPreview] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const imagesRef = useRef(null)
     const { pending, b64, properties } = useSelector(state => previewSelector(state))
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -146,8 +99,6 @@ const CreateGifs = props => {
         })
         setImages(imgs)
     }
-
-    const handlePreview = async () => {}
 
     const generatePreview = async () => {
         let drawImage = img => {
@@ -189,14 +140,6 @@ const CreateGifs = props => {
             dispatch(removePreview())
         }
     }, [formValues, images])
-
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-    }
 
     return (
         <Grid container spacing={3} className={classes.main}>
