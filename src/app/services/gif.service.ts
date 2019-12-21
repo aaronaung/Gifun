@@ -2,12 +2,12 @@ import gifShot from 'gifshot'
 import { GetAllGifsResponseInterface, GifInterface } from '../interfaces/Gifs.interface'
 import { putFile, getFile, deleteFile } from 'blockstack'
 import { v4 as uuid } from 'uuid'
-import { error } from '../utils/response'
 import { of } from 'rxjs'
 import { mergeAll, map } from 'rxjs/operators'
 import * as _ from 'lodash'
 import { gaiaPut } from './http.service'
 import GIF from 'gif.js'
+import { getExif, getGaiaHubUrl, b64ToBlob, error } from './utils'
 
 const USER_PATH = 'users'
 const GIFS_PATH = 'gifs'
@@ -16,16 +16,6 @@ const GIFS_PATH = 'gifs'
  * /user/{id}/gifs - [ gifids ]
  * /gifs/{id} - {b64, id, createdAt, properties}
  */
-
-export const getGaiaHubUrl = () => {
-    let blockStackSession = JSON.parse(localStorage.getItem('blockstack-session'))
-    let gaiaHubConfig = blockStackSession.userData.gaiaHubConfig
-    if (gaiaHubConfig) {
-        return `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}`
-    } else {
-        return {}
-    }
-}
 
 const _massageGIFProps = props => {
     let newProps = { ...props }
@@ -40,19 +30,6 @@ const _massageGIFProps = props => {
     newProps.frameDuration = props.frameDuration * 10
     newProps = { ...newProps, fontSize: `${props.fontSize || 20}px`, numFrames: 15, sampleInterval: 8 }
     return newProps
-}
-
-const b64ToBlob = b64 => {
-    let byteString = atob(b64.split(',')[1])
-    // write the bytes of the string to an ArrayBuffer
-    let ab = new ArrayBuffer(byteString.length)
-    let ia = new Uint8Array(ab)
-    for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i)
-    }
-
-    // write the ArrayBuffer to a blob, and you're done
-    return new Blob([ab], { type: 'image/gif' })
 }
 
 const constructHTMLSharable = (b64, imageLink) => {

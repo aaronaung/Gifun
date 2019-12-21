@@ -16,6 +16,7 @@ import MyDropzone from './Dropzone'
 import PreviewCard from './PreviewCard'
 import PreviewGif from './WebCamPreview'
 import ImagesPreview from './ImagesPreview'
+import { getExif } from '../services/utils'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -84,6 +85,7 @@ const CreateGifs = props => {
     /** State variables */
     const { tabState, setTabState } = useTabContext()
     const [images, setImages] = useState([])
+    const testRef = useRef(null)
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabValue(newValue)
@@ -93,6 +95,11 @@ const CreateGifs = props => {
     const handleFilesChange = images => {
         let imgs = Object.keys(images).map(id => {
             const img = document.createElement('img')
+            if (isMobile) {
+                img.style.transform = 'rotate(90deg)'
+            }
+            // const exif = await getExif(images[id].split(',')[1])
+            // alert(JSON.stringify(exif))
             img.src = images[id]
             return img
         })
@@ -127,6 +134,7 @@ const CreateGifs = props => {
                     )}
                 </TabPanel>
                 <TabPanel value={tabState} index={1}>
+                    <div ref={testRef}></div>
                     {tabState === 1 ? (
                         <div>
                             <MyDropzone onChange={handleFilesChange}></MyDropzone>

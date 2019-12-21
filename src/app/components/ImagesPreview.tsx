@@ -7,6 +7,8 @@ import { generateGif } from '../services/gif.service'
 import { newPreview, removePreview } from '../redux/preview/preview.action'
 import PreviewCard from './PreviewCard'
 import { previewSelector } from '../redux/preview/preview.selector'
+import { isMobile } from 'react-device-detect'
+import { getExif } from '../services/utils'
 
 const useStyles = makeStyles((theme: Theme) => ({
     imageContainer: {
@@ -31,20 +33,28 @@ export default function ImagesPreview({ images }) {
 
     const generatePreview = async () => {
         let drawImage = img => {
-            return new Promise((resolve, reject) => {
+            return new Promise(async (resolve, reject) => {
+                let exifData = await getExif(img.src.split(',')[1])
                 setTimeout(() => {
                     let canvas = document.createElement('canvas')
                     let ctx = canvas.getContext('2d')
+
                     canvas.width = formValues.gifWidth
                     canvas.height = formValues.gifHeight
                     var scale = Math.max(canvas.width / img.width, canvas.height / img.height)
                     // get the top left position of the image
                     var x = canvas.width / 2 - (img.width / 2) * scale
                     var y = canvas.height / 2 - (img.height / 2) * scale
+                    if (isMobile && exifData.Orientation === 6) {
+                        ctx.rotate((90 * Math.PI) / 180)
+                        ctx.translate(0, -canvas.width)
+                    }
                     ctx.drawImage(img, x, y, img.width * scale, img.height * scale)
+
                     let b64 = canvas.toDataURL()
                     let resultImage = new Image()
                     resultImage.src = b64
+
                     resolve(resultImage)
                 }, 200)
             })

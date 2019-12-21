@@ -25,7 +25,7 @@ import {
     Input,
     InputAdornment,
 } from '@material-ui/core'
-import { deleteUserGifs, getGaiaHubUrl } from '../services/gif.service'
+import { deleteUserGifs } from '../services/gif.service'
 import { getUser } from '../services/auth'
 import ShareIcon from '@material-ui/icons/Share'
 import AssignmentIcon from '@material-ui/icons/Assignment'
@@ -33,6 +33,7 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn'
 import * as _ from 'lodash'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
 import clsx from 'clsx'
+import { getGaiaHubUrl } from '../services/utils'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
