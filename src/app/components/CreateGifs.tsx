@@ -15,6 +15,7 @@ import CreateForm from './CreateForm'
 import MyDropzone from './Dropzone'
 import PreviewCard from './PreviewCard'
 import PreviewGif from './WebCamPreview'
+import ImagesPreview from './ImagesPreview'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -83,12 +84,10 @@ const CreateGifs = props => {
     /** State variables */
     const { tabState, setTabState } = useTabContext()
     const [images, setImages] = useState([])
-    const { formValues, formErrors } = useSelector(state => formSelector(state))
-    const [showPreview, setShowPreview] = useState(false)
-    const { pending, b64, properties } = useSelector(state => previewSelector(state))
 
     const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setTabValue(newValue)
+        setImages([])
     }
 
     const handleFilesChange = images => {
@@ -99,47 +98,6 @@ const CreateGifs = props => {
         })
         setImages(imgs)
     }
-
-    const generatePreview = async () => {
-        let drawImage = img => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    let canvas = document.createElement('canvas')
-                    let ctx = canvas.getContext('2d')
-                    canvas.width = formValues.gifWidth
-                    canvas.height = formValues.gifHeight
-                    var scale = Math.max(canvas.width / img.width, canvas.height / img.height)
-                    // get the top left position of the image
-                    var x = canvas.width / 2 - (img.width / 2) * scale
-                    var y = canvas.height / 2 - (img.height / 2) * scale
-                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale)
-                    let b64 = canvas.toDataURL()
-                    let resultImage = new Image()
-                    resultImage.src = b64
-                    resolve(resultImage)
-                }, 200)
-            })
-        }
-
-        let editedImages = await Promise.all(images.map(async img => await drawImage(img)))
-
-        const newProps = {
-            ...formValues,
-            images: editedImages,
-        }
-        let b64 = await generateGif(newProps)
-        dispatch(newPreview({ b64, properties: formValues }))
-    }
-
-    useEffect(() => {
-        if (Object.keys(images).length > 1) {
-            setShowPreview(true)
-            generatePreview()
-        } else {
-            setShowPreview(false)
-            dispatch(removePreview())
-        }
-    }, [formValues, images])
 
     return (
         <Grid container spacing={3} className={classes.main}>
@@ -169,24 +127,16 @@ const CreateGifs = props => {
                     )}
                 </TabPanel>
                 <TabPanel value={tabState} index={1}>
-                    <MyDropzone onChange={handleFilesChange}></MyDropzone>
                     {tabState === 1 ? (
-                        <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-                            <div className={classes.imageContainer}>
-                                <PreviewCard
-                                    gifProperties={formValues}
-                                    gifB64={b64}
-                                    hideCancelBtn={true}
-                                    defaultContent={
-                                        <Typography>You must upload at least two pictures to see the preview</Typography>
-                                    }
-                                ></PreviewCard>
-                            </div>
-
-                            <Grid item>
-                                <CreateForm tabIndex={1} />
+                        <div>
+                            <MyDropzone onChange={handleFilesChange}></MyDropzone>
+                            <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
+                                <ImagesPreview images={images} />
+                                <Grid item>
+                                    <CreateForm tabIndex={1} />
+                                </Grid>
                             </Grid>
-                        </Grid>
+                        </div>
                     ) : (
                         ''
                     )}

@@ -23,11 +23,11 @@ function TabProvider(props) {
     const tabState = tab
     const dispatch = useDispatch()
     const setTabState = state => {
-        setTab(state)
         if (state !== tab) {
             dispatch(resetForm())
             dispatch(removePreview())
         }
+        setTab(state)
     }
     const value = { tabState, setTabState }
     return <TabContext.Provider value={value} {...props} />

@@ -130,7 +130,7 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
     return (
         <>
             <CopyBoard open={openShareModal} setOpen={setOpenShareModal} shareableLink={shareableLink}></CopyBoard>
-            <Card style={{ minWidth: '200px', width: `${gifWidth}px` }}>
+            <Card style={{ minWidth: '200px', width: `${gifWidth}px`, height: 'fit-content' }}>
                 <CardActionArea>
                     {saving ? <CircularProgress className={clsx(classes.savingLoader)}></CircularProgress> : ''}
                     <div style={{ display: `${showDefault ? 'flex' : 'none'}` }} className={classes.defaultContent}>

@@ -9,6 +9,7 @@ import { newPreview, pendingPreview } from '../redux/preview/preview.action'
 import { previewSelector } from '../redux/preview/preview.selector'
 import { generateGif } from '../services/gif.service'
 import { debounce } from 'throttle-debounce'
+import { useTabContext } from '../contexts/TabContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -82,6 +83,7 @@ const formValidationFunctions = {
     gifHeight: (val, formValues) => !isNaN(val) && val >= 200,
     fontSize: (val, formValues) => !isNaN(val),
     fontColor: (val, formValues) => /^#[0-9A-F]{6}$/i.test(val) || val === '',
+    frameDuration: (val, formValues) => !isNaN(val) && val > 0,
     textXCoordinate: (val, formValues) => !isNaN(val) && val > 0 && val < formValues.gifWidth,
     textYCoordinate: (val, formValues) => !isNaN(val) && val > 0 && val < formValues.gifHeight,
 }
@@ -92,7 +94,7 @@ const CreateForm = ({ tabIndex }) => {
     const xRef = useRef()
     const yRef = useRef()
     const [inputState, setInputState] = useState({ e: null, key: null })
-
+    const { tabState } = useTabContext()
     const { pending } = useSelector(state => previewSelector(state))
     const { formValues, formErrors } = useSelector(state => formSelector(state))
 
@@ -103,7 +105,6 @@ const CreateForm = ({ tabIndex }) => {
     const updateForm = (value, key) => {
         let inputValue = value
         dispatch(updateFormValues({ [key]: value }))
-        console.log(value, key)
 
         if (formValidationFunctions[key]) {
             if (!formValidationFunctions[key](inputValue, formValues)) {
@@ -347,6 +348,23 @@ const CreateForm = ({ tabIndex }) => {
                         Bolder
                     </MenuItem>
                 </TextField>
+                <hr style={{ border: 'none' }}></hr>
+                {tabState === 1 ? (
+                    <TextField
+                        hidden={tabState === 0}
+                        id={`frameDuration-${tabIndex}`}
+                        label="Frame Duration"
+                        error={formErrors['frameDuration']}
+                        helperText={formErrors['frameDuration'] ? 'Must be a positive number' : ''}
+                        onChange={e => onInputChange(e, 'frameDuration')}
+                        defaultValue={1}
+                        InputProps={{
+                            endAdornment: <InputAdornment position="start">sec</InputAdornment>,
+                        }}
+                    />
+                ) : (
+                    ''
+                )}
             </form>
         </div>
     )
