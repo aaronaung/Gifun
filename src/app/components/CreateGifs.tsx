@@ -141,11 +141,11 @@ const CreateGifs = props => {
                         ''
                     )}
                 </TabPanel>
-                <TabPanel value={tabState} index={2}>
+                {/* <TabPanel value={tabState} index={2}>
                     <Typography color="textSecondary" className={classes.tabs}>
                         Coming soon...
                     </Typography>
-                </TabPanel>
+                </TabPanel> */}
             </Grid>
         </Grid>
     )

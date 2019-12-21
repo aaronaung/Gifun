@@ -198,7 +198,8 @@ export default function MiniDrawer({ children }) {
                     {/* move this to the header possibly when you have multiple */}
                     <Match path="/app/create">
                         {props =>
-                            props.match && (
+                            props.match &&
+                            !open && (
                                 <Tabs
                                     variant="standard"
                                     value={tabState}
