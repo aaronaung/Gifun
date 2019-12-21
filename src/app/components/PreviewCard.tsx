@@ -11,7 +11,7 @@ import FavoriteTwoTone from '@material-ui/icons/FavoriteTwoTone'
 import ShareIcon from '@material-ui/icons/Share'
 import clsx from 'clsx'
 import { navigate } from 'gatsby'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useCameraContext } from '../contexts/CameraContext'
 import { useSnackbarContext } from '../contexts/SnackbarContext'
@@ -68,9 +68,20 @@ const useStyles = makeStyles((theme: Theme) => ({
             color: `white !important`,
         },
     },
+    defaultContent: {
+        position: 'absolute',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        width: '100%',
+        height: '100%',
+        padding: 40,
+        color: theme.palette.secondary.main,
+    },
 }))
 
-export default function PreviewCard({ gifProperties, gifB64 }) {
+export default function PreviewCard({ gifProperties, gifB64, defaultContent, hideCancelBtn }) {
     const { gifHeight, gifWidth } = gifProperties
     const classes = useStyles()
 
@@ -81,11 +92,12 @@ export default function PreviewCard({ gifProperties, gifB64 }) {
     const { identityAddress: userId } = getUser()
     const { openSnackbar } = useSnackbarContext()
     const dispatch = useDispatch()
-    const { saved, shareableLink } = useSelector(state => previewSelector(state))
+    const { b64, saved, shareableLink } = useSelector(state => previewSelector(state))
+    const [showDefault, setShowDefault] = useState(true)
 
-    const handleSavePreview = useCallback(async () => {
+    const handleSavePreview = async () => {
         setSaving(true)
-        let resp = await uploadGifForUser(gifProperties, gifB64, userId)
+        let resp = await uploadGifForUser(gifProperties, b64, userId)
         dispatch(setSaved(true, resp.shareableLink))
         openSnackbar({
             message: 'Save successful',
@@ -100,12 +112,20 @@ export default function PreviewCard({ gifProperties, gifB64 }) {
             ],
         })
         setSaving(false)
-    }, [])
+    }
 
-    const handleRemovePreview = useCallback(() => {
+    const handleRemovePreview = () => {
         setCameraState({ on: false, loading: true })
         dispatch(removePreview())
-    })
+    }
+
+    useEffect(() => {
+        if (gifB64) {
+            setShowDefault(false)
+        } else {
+            setShowDefault(true)
+        }
+    }, [gifB64])
 
     return (
         <>
@@ -113,38 +133,41 @@ export default function PreviewCard({ gifProperties, gifB64 }) {
             <Card style={{ minWidth: '200px', width: `${gifWidth}px` }}>
                 <CardActionArea>
                     {saving ? <CircularProgress className={clsx(classes.savingLoader)}></CircularProgress> : ''}
+                    <div style={{ display: `${showDefault ? 'flex' : 'none'}` }} className={classes.defaultContent}>
+                        {defaultContent}
+                    </div>
                     <CardMedia
                         className={clsx(saving ? classes.savingOverlay : '')}
-                        image={gifB64}
+                        image={gifB64 || `data:image/jpeg;base64,`}
                         title="Gifun Preview"
                         style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }}
                     />
                 </CardActionArea>
 
                 <CardActions style={{ justifyContent: 'space-around' }}>
-                    <Tooltip title={<Typography variant="subtitle2">{!saving ? `Download` : `Saving ...`}</Typography>}>
+                    <Tooltip title={<Typography variant="subtitle2">{!saving && gifB64 ? `Download` : `Disabled`}</Typography>}>
                         <a download="gifun-preview.gif" href={gifB64} style={{ textDecoration: 'none' }}>
                             <Button
                                 onClick={() => openSnackbar({ message: 'Download successful', variant: 'success' })}
-                                disabled={saving}
+                                disabled={saving || !gifB64}
                                 size="medium"
                                 className={clsx(classes.actionBtn, classes.downloadBtn)}
                             >
-                                <CloudDownloadIcon color={saving ? 'disabled' : 'inherit'} />
+                                <CloudDownloadIcon color={saving || !gifB64 ? 'disabled' : 'inherit'} />
                             </Button>
                         </a>
                     </Tooltip>
 
                     {!saved ? (
-                        <Tooltip title={<Typography variant="subtitle2">{!saving ? `Save` : `Processing ...`}</Typography>}>
+                        <Tooltip title={<Typography variant="subtitle2">{!saving && gifB64 ? `Save` : `Disabled`}</Typography>}>
                             <span>
                                 <Button
-                                    disabled={saving}
+                                    disabled={saving || !gifB64}
                                     size="medium"
                                     onClick={handleSavePreview}
                                     className={clsx(classes.actionBtn, classes.favoriteBtn)}
                                 >
-                                    <FavoriteTwoTone color={saving ? 'disabled' : 'inherit'} />
+                                    <FavoriteTwoTone color={saving || !gifB64 ? 'disabled' : 'inherit'} />
                                 </Button>
                             </span>
                         </Tooltip>
@@ -153,37 +176,40 @@ export default function PreviewCard({ gifProperties, gifB64 }) {
                     )}
 
                     {saved ? (
-                        <Tooltip title={<Typography variant="subtitle2">{!saving ? `Share` : `Processing ...`}</Typography>}>
+                        <Tooltip title={<Typography variant="subtitle2">{!saving && gifB64 ? `Share` : `Disabled`}</Typography>}>
                             <span>
                                 <Button
-                                    disabled={saving}
+                                    disabled={saving || !gifB64}
                                     size="medium"
                                     onClick={() => {
                                         setOpenShareModal(true)
                                     }}
                                     className={clsx(classes.actionBtn, classes.shareBtn)}
                                 >
-                                    <ShareIcon color={saving ? 'disabled' : 'inherit'}></ShareIcon>
+                                    <ShareIcon color={saving || !gifB64 ? 'disabled' : 'inherit'}></ShareIcon>
                                 </Button>
                             </span>
                         </Tooltip>
                     ) : (
                         ''
                     )}
-
-                    <Tooltip title={<Typography variant="subtitle2">{!saving ? `Cancel` : `Processing ...`}</Typography>}>
-                        <span>
-                            <Button
-                                disabled={saving}
-                                size="medium"
-                                style={{ color: '#d32f2f' }}
-                                className={clsx(classes.actionBtn, classes.cancelBtn)}
-                                onClick={handleRemovePreview}
-                            >
-                                <CancelIcon color={saving ? 'disabled' : 'inherit'} fontSize="default" />
-                            </Button>
-                        </span>
-                    </Tooltip>
+                    {!hideCancelBtn ? (
+                        <Tooltip title={<Typography variant="subtitle2">{!saving && gifB64 ? `Cancel` : `Disabled`}</Typography>}>
+                            <span>
+                                <Button
+                                    disabled={saving || !gifB64}
+                                    size="medium"
+                                    style={{ color: '#d32f2f' }}
+                                    className={clsx(classes.actionBtn, classes.cancelBtn)}
+                                    onClick={handleRemovePreview}
+                                >
+                                    <CancelIcon color={saving || !gifB64 ? 'disabled' : 'inherit'} fontSize="default" />
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    ) : (
+                        ''
+                    )}
                 </CardActions>
             </Card>
         </>

@@ -1,13 +1,14 @@
 import { createStyles, InputAdornment, makeStyles, MenuItem, TextField, Theme, Tooltip, Typography } from '@material-ui/core'
 import VerticalAlignCenterIcon from '@material-ui/icons/VerticalAlignCenter'
 import { Autocomplete } from '@material-ui/lab'
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { resetForm, setFormErrors, updateFormValues } from '../redux/form/form.action'
 import { formSelector } from '../redux/form/form.selector'
 import { newPreview, pendingPreview } from '../redux/preview/preview.action'
 import { previewSelector } from '../redux/preview/preview.selector'
 import { generateGif } from '../services/gif.service'
+import { debounce } from 'throttle-debounce'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -77,19 +78,20 @@ const webSafeFonts = [
 /** maps field names to validation fns */
 
 const formValidationFunctions = {
-    gifWidth: (val, formValues) => !isNaN(val),
-    gifHeight: (val, formValues) => !isNaN(val),
+    gifWidth: (val, formValues) => !isNaN(val) && val >= 200,
+    gifHeight: (val, formValues) => !isNaN(val) && val >= 200,
     fontSize: (val, formValues) => !isNaN(val),
     fontColor: (val, formValues) => /^#[0-9A-F]{6}$/i.test(val) || val === '',
     textXCoordinate: (val, formValues) => !isNaN(val) && val > 0 && val < formValues.gifWidth,
     textYCoordinate: (val, formValues) => !isNaN(val) && val > 0 && val < formValues.gifHeight,
 }
 
-const CreateForm = () => {
+const CreateForm = ({ tabIndex }) => {
     const classes = useStyles()
     const dispatch = useDispatch()
     const xRef = useRef()
     const yRef = useRef()
+    const [inputState, setInputState] = useState({ e: null, key: null })
 
     const { pending } = useSelector(state => previewSelector(state))
     const { formValues, formErrors } = useSelector(state => formSelector(state))
@@ -98,9 +100,10 @@ const CreateForm = () => {
         return () => dispatch(resetForm())
     }, [])
 
-    const onInputChange = (e, key) => {
-        let inputValue = e.target.value
-        dispatch(updateFormValues({ [key]: e.target.value }))
+    const updateForm = (value, key) => {
+        let inputValue = value
+        dispatch(updateFormValues({ [key]: value }))
+        console.log(value, key)
 
         if (formValidationFunctions[key]) {
             if (!formValidationFunctions[key](inputValue, formValues)) {
@@ -111,6 +114,11 @@ const CreateForm = () => {
                 dispatch(setFormErrors(newFormErrors))
             }
         }
+    }
+    const debouncedUpdateForm = debounce(500, false, updateForm)
+    const onInputChange = (e, key) => {
+        let value = e.target.value
+        debouncedUpdateForm(value, key)
     }
 
     const formSubmit = useCallback(async () => {
@@ -126,10 +134,10 @@ const CreateForm = () => {
         <div>
             <form className={classes.root}>
                 <TextField
-                    id="standard-basic"
+                    id={`width-${tabIndex}`}
                     label="Width"
                     error={formErrors['gifWidth']}
-                    helperText={formErrors['gifWidth'] ? 'Must be a number' : ''}
+                    helperText={formErrors['gifWidth'] ? 'Must be a number greater than or equal to 200' : ''}
                     onChange={e => onInputChange(e, 'gifWidth')}
                     defaultValue={300}
                     InputProps={{
@@ -137,10 +145,10 @@ const CreateForm = () => {
                     }}
                 />
                 <TextField
-                    id="standard-basic"
+                    id={`height-${tabIndex}`}
                     label="Height"
                     error={formErrors['gifHeight']}
-                    helperText={formErrors['gifHeight'] ? 'Must be a number' : ''}
+                    helperText={formErrors['gifHeight'] ? 'Must be a number greater than or equal to 200' : ''}
                     onChange={e => onInputChange(e, 'gifHeight')}
                     defaultValue={300}
                     InputProps={{
@@ -149,7 +157,7 @@ const CreateForm = () => {
                 />
                 <hr style={{ border: 'none' }}></hr>
                 <TextField
-                    id="standard-basic"
+                    id={`text-${tabIndex}`}
                     label="Text"
                     error={formErrors['text']}
                     defaultValue="Hello World"
@@ -157,7 +165,7 @@ const CreateForm = () => {
                 />
 
                 <TextField
-                    id="standard-select"
+                    id={`textPlacement-${tabIndex}`}
                     label="Text Placement"
                     select
                     className={classes.textField}
@@ -199,7 +207,7 @@ const CreateForm = () => {
                     </MenuItem>
                 </TextField>
                 <TextField
-                    id="standard-basic"
+                    id={`xCoordinate-${tabIndex}`}
                     label="Text X-Coordinate"
                     error={formErrors['textXCoordinate']}
                     helperText={
@@ -240,7 +248,7 @@ const CreateForm = () => {
                 />
 
                 <TextField
-                    id="standard-basic"
+                    id={`yCoordinate-${tabIndex}`}
                     label="Text Y-Coordinate"
                     error={formErrors['textYCoordinate']}
                     helperText={
@@ -279,7 +287,7 @@ const CreateForm = () => {
                 />
                 <hr style={{ border: 'none' }}></hr>
                 <TextField
-                    id="standard-basic"
+                    id={`fontSize-${tabIndex}`}
                     label="Font Size"
                     error={formErrors['fontSize']}
                     helperText={formErrors['fontSize'] ? 'Must be a number' : ''}
@@ -290,7 +298,7 @@ const CreateForm = () => {
                     }}
                 />
                 <TextField
-                    id="standard-basic"
+                    id={`fontColor-${tabIndex}`}
                     label="Font Color"
                     error={formErrors['fontColor']}
                     helperText={formErrors['fontColor'] ? 'Invalid color hex value' : ''}
@@ -301,7 +309,7 @@ const CreateForm = () => {
                     }}
                 />
                 <Autocomplete
-                    id="fontFamily"
+                    id={`fontFamily-${tabIndex}`}
                     options={webSafeFonts}
                     getOptionLabel={option => option}
                     defaultValue="Arial"
@@ -310,7 +318,7 @@ const CreateForm = () => {
                     renderInput={params => <TextField {...params} label="Font Family" variant="outlined" fullWidth />}
                 />
                 <TextField
-                    id="standard-select"
+                    id={`fontWeight-${tabIndex}`}
                     label="Font Weight"
                     select
                     className={classes.textField}

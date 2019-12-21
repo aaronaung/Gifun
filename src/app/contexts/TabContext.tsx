@@ -1,4 +1,7 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { resetForm } from '../redux/form/form.action'
+import { removePreview } from '../redux/preview/preview.action'
 
 const TabContext = React.createContext(null)
 
@@ -16,8 +19,16 @@ function useTabContext(): TabContext {
 }
 
 function TabProvider(props) {
-    const [tabState, setTabState] = React.useState(0)
-
+    const [tab, setTab] = React.useState(0)
+    const tabState = tab
+    const dispatch = useDispatch()
+    const setTabState = state => {
+        setTab(state)
+        if (state !== tab) {
+            dispatch(resetForm())
+            dispatch(removePreview())
+        }
+    }
     const value = { tabState, setTabState }
     return <TabContext.Provider value={value} {...props} />
 }

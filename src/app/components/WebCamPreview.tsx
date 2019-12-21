@@ -24,6 +24,7 @@ import { previewSelector } from '../redux/preview/preview.selector'
 import { generateGif } from '../services/gif.service'
 import PreviewCard from './PreviewCard'
 import Loading from './Loader'
+import TextPreview from './TextPreview'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -258,14 +259,7 @@ const PreviewGif = () => {
 
             <div style={{ width: 'fit-content' }}>
                 {!previewState.processing && !b64 && cameraState.on && showText && Object.keys(formErrors).length === 0 ? (
-                    <div
-                        className={classes.textPlacementOverlay}
-                        style={{ width: previewSize.width, height: previewSize.height }}
-                    >
-                        <div className="text" style={textPreviewStyling()}>
-                            {formValues.text}
-                        </div>
-                    </div>
+                    <TextPreview previewSize={previewSize} />
                 ) : (
                     ''
                 )}
