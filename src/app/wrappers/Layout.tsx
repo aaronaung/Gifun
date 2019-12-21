@@ -192,7 +192,7 @@ export default function MiniDrawer({ children }) {
                     </IconButton>
                     <img src={gifunLogo} className={classes.gifunLogo} alt="" />
                     <Typography variant="h6" color="secondary" noWrap>
-                        <b>GIFun</b>
+                        {isMobile ? '' : <b>GIFun</b>}
                     </Typography>
 
                     {/* move this to the header possibly when you have multiple */}
@@ -208,7 +208,7 @@ export default function MiniDrawer({ children }) {
                                 >
                                     <Tab label="Webcam" {...a11yProps(0)} />
                                     <Tab label="Images" {...a11yProps(1)} />
-                                    <Tab label="Video" {...a11yProps(2)} />
+                                    {/* <Tab label="Video" {...a11yProps(2)} /> */}
                                 </Tabs>
                             )
                         }
