@@ -99,6 +99,9 @@ const CreateForm = ({ tabIndex }) => {
     const { formValues, formErrors } = useSelector(state => formSelector(state))
 
     useEffect(() => {
+        if (tabState === 1) {
+            dispatch(updateFormValues({ frameDuration: 1 }))
+        }
         return () => dispatch(resetForm())
     }, [])
 

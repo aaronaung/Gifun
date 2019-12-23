@@ -12,7 +12,7 @@ const INITIAL_STATE = {
         text: 'Hello World',
         fontFamily: 'Arial',
         fontWeight: 'normal',
-        frameDuration: 1,
+        frameDuration: 0.1,
     },
     formErrors: {},
 }

@@ -14,7 +14,7 @@ import '../vendors/flickity.css'
 import CreateForm from './CreateForm'
 import MyDropzone from './Dropzone'
 import PreviewCard from './PreviewCard'
-import PreviewGif from './WebCamPreview'
+import WebcamPreview from './WebCamPreview'
 import ImagesPreview from './ImagesPreview'
 import { getExif } from '../services/utils'
 
@@ -110,28 +110,18 @@ const CreateGifs = props => {
         <Grid container spacing={3} className={classes.main}>
             <Grid item xs={12} lg={12}>
                 <TabPanel value={tabState} index={0}>
-                    {isMobile ? (
-                        <>
-                            <Typography>
-                                Because of technical limitations, the browser version of <b>GIFun</b> webcam feature is not
-                                supported on mobile devices at the moment.
-                            </Typography>
-                            <img src={sorry} className={clsx(classes.sorryGif)}></img>
-                        </>
-                    ) : (
-                        <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-                            <div style={{ marginRight: 20 }}>
-                                <PreviewGif />
-                            </div>
-                            {tabState === 0 ? (
-                                <Grid item style={{ marginTop: '40px' }}>
-                                    <CreateForm tabIndex={0} />
-                                </Grid>
-                            ) : (
-                                ''
-                            )}
-                        </Grid>
-                    )}
+                    <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
+                        <div style={{ marginRight: 20 }}>
+                            <WebcamPreview />
+                        </div>
+                        {tabState === 0 ? (
+                            <Grid item style={{ marginTop: '40px' }}>
+                                <CreateForm tabIndex={0} />
+                            </Grid>
+                        ) : (
+                            ''
+                        )}
+                    </Grid>
                 </TabPanel>
                 <TabPanel value={tabState} index={1}>
                     <div ref={testRef}></div>

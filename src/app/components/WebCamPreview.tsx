@@ -21,10 +21,11 @@ import { useSnackbarContext } from '../contexts/SnackbarContext'
 import { formSelector } from '../redux/form/form.selector'
 import { newPreview, pendingPreview } from '../redux/preview/preview.action'
 import { previewSelector } from '../redux/preview/preview.selector'
-import { generateGif } from '../services/gif.service'
+import { generateGif, generateGifOnMobile } from '../services/gif.service'
 import PreviewCard from './PreviewCard'
 import Loading from './Loader'
 import TextPreview from './TextPreview'
+import { isMobile } from 'react-device-detect'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -56,6 +57,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column',
         width: 'fit-content',
         marginRight: '20px',
+        minWidth: 300,
+        minHeight: 300,
     },
     textPlacementOverlay: {
         position: 'absolute',
@@ -65,7 +68,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderTopRightRadius: '0px',
         height: '49px',
     },
-
+    'video::-webkit-media-controls-overlay-play-button': {
+        display: 'none',
+    },
     counterOverlay: {
         display: 'flex',
         position: 'absolute',
@@ -137,7 +142,7 @@ function PreviewGuideDialog({ open, setOpen }) {
     )
 }
 
-const PreviewGif = () => {
+export default function WebcamPreview() {
     const classes = useStyles()
     const dispatch = useDispatch()
     const webcamRef = useRef(null)
@@ -162,41 +167,6 @@ const PreviewGif = () => {
         }
     }, [formValues.gifWidth, formValues.gifHeight])
 
-    const textPreviewStyling = useCallback(() => {
-        let baseFontStyle = {
-            color: formValues.fontColor,
-            fontFamily: formValues.fontFamily,
-            fontWeight: formValues.fontWeight,
-            fontSize: `${formValues.fontSize}px`,
-        }
-        switch (formValues.textBaseline) {
-            case 'custom':
-                return {
-                    ...baseFontStyle,
-                    position: 'relative',
-                    top: `${formValues.textYCoordinate}px`,
-                    left: `${formValues.textXCoordinate}px`,
-                    transform: `translate(-50%,-75%)`,
-                    width: 'fit-content',
-                }
-            case 'bottom':
-                return {
-                    ...baseFontStyle,
-                    position: 'relative',
-                    textAlign: 'center',
-                    top: '100%',
-                    transform: 'translateY(-100%)',
-                }
-            case 'top':
-                return {
-                    ...baseFontStyle,
-                    position: 'relative',
-                    textAlign: 'center',
-                    top: '0px',
-                }
-        }
-    }, [formValues])
-
     const formSubmit = useCallback(async () => {
         if (Object.keys(formErrors).length === 0) {
             setPreviewState({ counting: true, recording: false, processing: false })
@@ -212,7 +182,18 @@ const PreviewGif = () => {
                     gifHeight: webcamRef.current.video.videoHeight,
                     gifWidth: webcamRef.current.video.videoWidth,
                 }
-                let b64 = await generateGif(newProps)
+                let b64 = ''
+                try {
+                    if (isMobile) {
+                        let videoElement = webcamRef.current.video
+                        b64 = await generateGifOnMobile(videoElement, newProps)
+                    } else {
+                        b64 = await generateGif(newProps)
+                    }
+                } catch (err) {
+                    alert(err.message)
+                }
+
                 setPreviewState({ counting: false, recording: false, processing: false })
                 dispatch(newPreview({ b64, properties: formValues }))
             }, COUNTER_INTERVAL * 3)
@@ -228,12 +209,9 @@ const PreviewGif = () => {
         }
     }, [formValues])
 
-    return (
-        <div style={{ marginLeft: '16px' }}>
-            <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
-                Preview
-            </Typography>
-            {!b64 && !cameraState.loading ? (
+    const renderPreviewHeader = () => {
+        if (!b64 && !cameraState.loading) {
+            return (
                 <div className={classes.topBar} style={{ width: previewSize.width }}>
                     <FormControlLabel
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}
@@ -253,74 +231,104 @@ const PreviewGif = () => {
                         onClose={() => setOpenDialog(false)}
                     ></PreviewGuideDialog>
                 </div>
-            ) : (
-                ''
-            )}
+            )
+        }
+    }
 
-            <div style={{ width: 'fit-content' }}>
-                {!previewState.processing && !b64 && cameraState.on && showText && Object.keys(formErrors).length === 0 ? (
-                    <TextPreview previewSize={previewSize} />
-                ) : (
-                    ''
-                )}
-                {previewState.counting ? (
-                    <div className={classes.counterOverlay} style={{ width: previewSize.width, height: previewSize.height }}>
-                        {counter}
-                    </div>
-                ) : (
-                    ''
-                )}
-                {previewState.processing || cameraState.loading ? (
-                    <Loading width={previewSize.width} height={previewSize.height} />
-                ) : (
-                    ''
-                )}
-                {b64 && !pending ? (
-                    <div className={classes.videoContainer}>
-                        <PreviewCard gifProperties={properties} gifB64={b64} />
-                    </div>
-                ) : (
-                    <div className={classes.videoContainer}>
-                        <Webcam
-                            style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}
-                            ref={webcamRef}
-                            videoConstraints={{ width: formValues.gifWidth, height: formValues.gifHeight }}
-                            onUserMedia={() => {
-                                setCameraState({ on: false, loading: true })
+    const renderTextPreview = () => {
+        if (!previewState.processing && !b64 && !cameraState.loading && showText && Object.keys(formErrors).length === 0) {
+            return <TextPreview previewSize={previewSize} />
+        }
+    }
+
+    const renderCounter = () => {
+        if (previewState.counting) {
+            return (
+                <div className={classes.counterOverlay} style={{ width: previewSize.width, height: previewSize.height }}>
+                    {counter}
+                </div>
+            )
+        }
+    }
+
+    const renderLoader = () => {
+        if (previewState.processing || cameraState.loading) {
+            return <Loading width={previewSize.width} height={previewSize.height} />
+        }
+    }
+
+    const renderWebcam = () => {
+        const renderButton = () => {
+            if (!cameraState.loading) {
+                return (
+                    <Button
+                        className={classes.generateBtn}
+                        onClick={formSubmit}
+                        variant="outlined"
+                        color="default"
+                        disabled={pending || !Object.keys(formErrors).length === 0}
+                    >
+                        {previewState.recording ? (
+                            <Typography className={classes.startGiffing} color="secondary">
+                                START GIFFING!
+                            </Typography>
+                        ) : (
+                            'PREVIEW GIF'
+                        )}
+                    </Button>
+                )
+            }
+        }
+        if (!b64 && !previewState.processing) {
+            return (
+                <div className={classes.videoContainer}>
+                    <Webcam
+                        style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}
+                        ref={webcamRef}
+                        videoConstraints={{ width: formValues.gifWidth, height: formValues.gifHeight }}
+                        onUserMedia={() => {
+                            setCameraState({ loading: true })
+                            if (webcamRef && webcamRef.current && webcamRef.current.video) {
                                 webcamRef.current.video.onplaying = () => {
-                                    setCameraState({ on: true, loading: false })
+                                    setCameraState({ loading: false })
                                     let newDimensions = {
                                         width: webcamRef.current.video.videoWidth,
                                         height: webcamRef.current.video.videoHeight,
                                     }
                                     setPreviewSize(newDimensions)
                                 }
-                            }}
-                        ></Webcam>
-                        {cameraState.on && !previewState.processing ? (
-                            <Button
-                                className={classes.generateBtn}
-                                onClick={formSubmit}
-                                variant="outlined"
-                                color="default"
-                                disabled={pending || !Object.keys(formErrors).length === 0}
-                            >
-                                {previewState.recording ? (
-                                    <Typography className={classes.startGiffing} color="secondary">
-                                        START GIFFING!
-                                    </Typography>
-                                ) : (
-                                    'PREVIEW GIF'
-                                )}
-                            </Button>
-                        ) : (
-                            ''
-                        )}
-                    </div>
-                )}
+                            }
+                        }}
+                    ></Webcam>
+                    {renderButton()}
+                </div>
+            )
+        }
+    }
+
+    const renderPreview = () => {
+        if (b64 && !pending && !cameraState.loading) {
+            return (
+                <div className={classes.videoContainer}>
+                    <PreviewCard gifProperties={properties} gifB64={b64} />
+                </div>
+            )
+        }
+    }
+
+    return (
+        <div style={{ marginLeft: '16px' }}>
+            <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
+                Preview
+            </Typography>
+            {renderPreviewHeader()}
+            <div style={{ width: 'fit-content', minWidth: '300px', minHeight: '300px' }}>
+                {renderTextPreview()}
+                {renderCounter()}
+                {renderLoader()}
+                {renderWebcam()}
+                {renderPreview()}
             </div>
         </div>
     )
 }
-
-export default PreviewGif

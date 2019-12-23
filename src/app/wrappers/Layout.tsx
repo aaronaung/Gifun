@@ -238,7 +238,15 @@ export default function MiniDrawer({ children }) {
                 <Divider />
                 <List>
                     <Tooltip title={!open ? <Typography variant="subtitle2">My GIFs</Typography> : ''} placement="right">
-                        <ListItem className={clsx(classes.favoriteBtn)} button key={'My Gifs'} onClick={() => navigate('/app')}>
+                        <ListItem
+                            className={clsx(classes.favoriteBtn)}
+                            button
+                            key={'My Gifs'}
+                            onClick={() => {
+                                setOpen(false)
+                                navigate('/app')
+                            }}
+                        >
                             <ListItemIcon style={{ paddingLeft: 8 }}>
                                 <FavoriteIcon />
                             </ListItemIcon>
@@ -251,7 +259,10 @@ export default function MiniDrawer({ children }) {
                             className={clsx(classes.addBtn)}
                             button
                             key={'Create Gifs'}
-                            onClick={() => navigate('/app/create')}
+                            onClick={() => {
+                                setOpen(false)
+                                navigate('/app/create')
+                            }}
                         >
                             <ListItemIcon style={{ paddingLeft: 8 }}>
                                 <AddBoxIcon />

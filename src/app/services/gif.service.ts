@@ -8,6 +8,7 @@ import * as _ from 'lodash'
 import { gaiaPut } from './http.service'
 import GIF from 'gif.js'
 import { getExif, getGaiaHubUrl, b64ToBlob, error } from './utils'
+import Videoshooter from '../vendors/videoshooter'
 
 const USER_PATH = 'users'
 const GIFS_PATH = 'gifs'
@@ -43,6 +44,36 @@ const constructHTMLSharable = (b64, imageLink) => {
         <meta property="og:description" content="Get your personalized GIF content with Gifun."/>
         <img src=${b64}></img>`
     return htmlText
+}
+
+export const generateGifOnMobile = (videoElement, props) => {
+    let newProps = _massageGIFProps(props)
+    return new Promise((resolve, reject) => {
+        const cropDimensions = Videoshooter.getCropDimensions(
+            newProps.gifWidth,
+            newProps.gifHeight,
+            newProps.gifWidth,
+            newProps.gifHeight
+        )
+        const videoShooter = new Videoshooter(
+            videoElement,
+            newProps.gifWidth,
+            newProps.gifHeight,
+            newProps.gifWidth,
+            newProps.gifHeight,
+            cropDimensions,
+            newProps
+        )
+
+        videoShooter.getShot(
+            arg => {
+                resolve(arg)
+            },
+            15,
+            0.1,
+            progressArg => {}
+        )
+    })
 }
 
 export const generateGif = props => {

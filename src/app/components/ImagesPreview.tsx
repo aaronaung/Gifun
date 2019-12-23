@@ -9,6 +9,7 @@ import PreviewCard from './PreviewCard'
 import { previewSelector } from '../redux/preview/preview.selector'
 import { isMobile } from 'react-device-detect'
 import { getExif } from '../services/utils'
+import { updateFormValues, resetForm } from '../redux/form/form.action'
 
 const useStyles = makeStyles((theme: Theme) => ({
     imageContainer: {
