@@ -40,7 +40,7 @@ export default function TextPreview({ previewSize }) {
     }, [formValues])
 
     return (
-        <div style={{ width: previewSize.width, height: previewSize.height, position: 'absolute' }}>
+        <div style={{ width: previewSize.width, height: previewSize.height, position: 'absolute', zIndex: 10 }}>
             <div style={textPreviewStyling()}>{formValues.text}</div>
         </div>
     )

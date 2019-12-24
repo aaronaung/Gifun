@@ -308,9 +308,14 @@ export default function WebcamPreview() {
         <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
             <div style={{ marginRight: 20 }}>
                 <div style={{ marginLeft: '16px' }}>
-                    <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
-                        Preview
-                    </Typography>
+                    {b64 ? (
+                        <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h6">
+                            Preview
+                        </Typography>
+                    ) : (
+                        ''
+                    )}
+
                     {renderPreviewHeader()}
                     <div style={{ width: 'fit-content', minWidth: '300px', minHeight: '300px' }}>
                         {renderTextPreview()}
