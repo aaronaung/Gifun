@@ -58,7 +58,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         width: 'fit-content',
-        marginRight: '20px',
         minWidth: 300,
         minHeight: 300,
     },
@@ -306,32 +305,30 @@ export default function WebcamPreview() {
 
     return (
         <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-            <div style={{ marginRight: 20 }}>
-                <div style={{ marginLeft: '16px' }}>
-                    {b64 ? (
-                        <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h6">
-                            Preview
-                        </Typography>
-                    ) : (
-                        ''
-                    )}
-
-                    {renderPreviewHeader()}
-                    <div style={{ width: 'fit-content', minWidth: '300px', minHeight: '300px' }}>
-                        {renderTextPreview()}
-                        {renderCounter()}
-                        {renderLoader()}
-                        <div
-                            className={classes.videoContainer}
-                            style={{ minWidth: previewSize.width, minHeight: `${previewSize.height}px` }}
-                        >
-                            {renderWebcam()}
-                            {renderPreview()}
-                        </div>
-                        {renderPreviewButton()}
+            <div style={{ marginLeft: 16, marginRight: 30 }}>
+                {b64 ? (
+                    <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h6">
+                        Preview
+                    </Typography>
+                ) : (
+                    ''
+                )}
+                {renderPreviewHeader()}
+                <div style={{ width: 'fit-content', minWidth: '300px', minHeight: '300px' }}>
+                    {renderTextPreview()}
+                    {renderCounter()}
+                    {renderLoader()}
+                    <div
+                        className={classes.videoContainer}
+                        style={{ minWidth: previewSize.width, minHeight: `${previewSize.height}px` }}
+                    >
+                        {renderWebcam()}
+                        {renderPreview()}
                     </div>
+                    {renderPreviewButton()}
                 </div>
             </div>
+
             <Grid item style={{ marginTop: '40px' }}>
                 <CreateForm tabIndex={0} />
             </Grid>
