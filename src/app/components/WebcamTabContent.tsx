@@ -9,6 +9,7 @@ import {
     Theme,
     Tooltip,
     Typography,
+    Grid,
 } from '@material-ui/core'
 import Button from '@material-ui/core/Button'
 import InfoIcon from '@material-ui/icons/Info'
@@ -26,6 +27,7 @@ import PreviewCard from './PreviewCard'
 import Loading from './Loader'
 import TextPreview from './TextPreview'
 import { isMobile } from 'react-device-detect'
+import CreateForm from './CreateForm'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -66,7 +68,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     generateBtn: {
         borderTopLeftRadius: '0px',
         borderTopRightRadius: '0px',
-        height: '49px',
+        height: '50px',
     },
     'video::-webkit-media-controls-overlay-play-button': {
         display: 'none',
@@ -78,6 +80,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         alignItems: 'center',
         background: 'rgba(0,0,0,0.5)',
         fontSize: '25px',
+        zIndex: 10,
     },
     startGiffing: {
         color: theme.palette.secondary.main,
@@ -149,14 +152,14 @@ export default function WebcamPreview() {
 
     /** State variables */
     const [previewSize, setPreviewSize] = useState({ width: 300, height: 300 })
-    const [cameraState, setCameraState] = useCameraContext()
+    const [camLoading, setCamLoading] = useState(true)
     const { openSnackbar } = useSnackbarContext()
     const [counter, setCounter] = useState(3)
     const [showText, setShowText] = useState(true)
     const [openDialog, setOpenDialog] = useState(false)
-    const [previewState, setPreviewState] = useState({ counting: false, processing: false, recording: false })
-
+    const [previewState, setPreviewState] = useState({ counting: false, recording: false })
     /** Redux store values */
+
     const { pending, b64, properties } = useSelector(state => previewSelector(state))
     const { formValues, formErrors } = useSelector(state => formSelector(state))
 
@@ -169,14 +172,14 @@ export default function WebcamPreview() {
 
     const formSubmit = useCallback(async () => {
         if (Object.keys(formErrors).length === 0) {
-            setPreviewState({ counting: true, recording: false, processing: false })
+            setPreviewState({ counting: true, recording: false })
             dispatch(pendingPreview(true))
 
             let interval = setInterval(() => setCounter(counter => counter - 1), COUNTER_INTERVAL)
             setTimeout(async () => {
                 clearInterval(interval)
                 setCounter(3)
-                setPreviewState({ counting: false, recording: true, processing: false })
+                setPreviewState({ counting: false, recording: true })
                 let newProps = {
                     ...formValues,
                     gifHeight: webcamRef.current.video.videoHeight,
@@ -191,35 +194,30 @@ export default function WebcamPreview() {
                         b64 = await generateGif(newProps)
                     }
                 } catch (err) {
-                    alert(err.message)
+                    console.log(err.message)
                 }
 
-                setPreviewState({ counting: false, recording: false, processing: false })
+                dispatch(pendingPreview(false))
                 dispatch(newPreview({ b64, properties: formValues }))
+                openSnackbar({ message: 'Preview ready', variant: 'info' })
             }, COUNTER_INTERVAL * 3)
 
             setTimeout(() => {
-                /** after the gif capture time is over and gif is still processing */
-                if (previewState.processing === false && !b64) {
-                    setPreviewState({ counting: false, recording: false, processing: true })
-                }
-                dispatch(pendingPreview(false))
-                openSnackbar({ message: 'Preview ready', variant: 'info' })
+                setPreviewState({ counting: false, recording: false })
             }, COUNTER_INTERVAL * 6)
         }
     }, [formValues])
 
     const renderPreviewHeader = () => {
-        if (!b64 && !cameraState.loading) {
+        if (!b64) {
             return (
-                <div className={classes.topBar} style={{ width: previewSize.width }}>
+                <div className={classes.topBar} style={{ minWidth: 300, maxWidth: previewSize.width }}>
                     <FormControlLabel
                         control={<Switch checked={showText} onChange={e => setShowText(e.target.checked)}></Switch>}
                         label={<Typography color="textSecondary">Show text placement</Typography>}
                     ></FormControlLabel>
                     <Tooltip title={<Typography variant="subtitle2">Note</Typography>}>
                         <InfoIcon
-                            className={classes.test}
                             color="disabled"
                             onClick={() => setOpenDialog(true)}
                             style={{ marginLeft: 'auto', cursor: 'pointer' }}
@@ -236,7 +234,7 @@ export default function WebcamPreview() {
     }
 
     const renderTextPreview = () => {
-        if (!previewState.processing && !b64 && !cameraState.loading && showText && Object.keys(formErrors).length === 0) {
+        if (!b64 && !camLoading && showText && Object.keys(formErrors).length === 0) {
             return <TextPreview previewSize={previewSize} />
         }
     }
@@ -252,83 +250,86 @@ export default function WebcamPreview() {
     }
 
     const renderLoader = () => {
-        if (previewState.processing || cameraState.loading) {
+        if ((pending && !previewState.recording && !previewState.counting) || camLoading) {
             return <Loading width={previewSize.width} height={previewSize.height} />
         }
     }
+    const renderPreviewButton = () => {
+        if (!camLoading && !b64)
+            return (
+                <Button
+                    className={classes.generateBtn}
+                    onClick={formSubmit}
+                    variant="outlined"
+                    color="default"
+                    disabled={pending || !Object.keys(formErrors).length === 0}
+                    style={{ width: previewSize.width }}
+                >
+                    {previewState.recording ? (
+                        <Typography className={classes.startGiffing} color="secondary">
+                            START GIFFING!
+                        </Typography>
+                    ) : (
+                        'PREVIEW GIF'
+                    )}
+                </Button>
+            )
+    }
 
     const renderWebcam = () => {
-        const renderButton = () => {
-            if (!cameraState.loading) {
-                return (
-                    <Button
-                        className={classes.generateBtn}
-                        onClick={formSubmit}
-                        variant="outlined"
-                        color="default"
-                        disabled={pending || !Object.keys(formErrors).length === 0}
-                    >
-                        {previewState.recording ? (
-                            <Typography className={classes.startGiffing} color="secondary">
-                                START GIFFING!
-                            </Typography>
-                        ) : (
-                            'PREVIEW GIF'
-                        )}
-                    </Button>
-                )
-            }
-        }
-        if (!b64 && !previewState.processing) {
-            return (
-                <div className={classes.videoContainer}>
-                    <Webcam
-                        style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px' }}
-                        ref={webcamRef}
-                        videoConstraints={{ width: formValues.gifWidth, height: formValues.gifHeight }}
-                        onUserMedia={() => {
-                            setCameraState({ loading: true })
-                            if (webcamRef && webcamRef.current && webcamRef.current.video) {
-                                webcamRef.current.video.onplaying = () => {
-                                    setCameraState({ loading: false })
-                                    let newDimensions = {
-                                        width: webcamRef.current.video.videoWidth,
-                                        height: webcamRef.current.video.videoHeight,
-                                    }
-                                    setPreviewSize(newDimensions)
-                                }
+        return (
+            <Webcam
+                style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px', position: 'absolute' }}
+                ref={webcamRef}
+                videoConstraints={{ width: formValues.gifWidth, height: formValues.gifHeight }}
+                onUserMedia={() => {
+                    if (webcamRef && webcamRef.current && webcamRef.current.video) {
+                        webcamRef.current.video.onplaying = () => {
+                            let newDimensions = {
+                                width: webcamRef.current.video.videoWidth,
+                                height: webcamRef.current.video.videoHeight,
                             }
-                        }}
-                    ></Webcam>
-                    {renderButton()}
-                </div>
-            )
-        }
+                            setCamLoading(false)
+                            setPreviewSize(newDimensions)
+                        }
+                    }
+                }}
+            ></Webcam>
+        )
     }
 
     const renderPreview = () => {
-        if (b64 && !pending && !cameraState.loading) {
-            return (
-                <div className={classes.videoContainer}>
-                    <PreviewCard gifProperties={properties} gifB64={b64} />
-                </div>
-            )
+        if (b64 && !pending) {
+            return <PreviewCard gifProperties={properties} gifB64={b64} />
         }
     }
 
     return (
-        <div style={{ marginLeft: '16px' }}>
-            <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
-                Preview
-            </Typography>
-            {renderPreviewHeader()}
-            <div style={{ width: 'fit-content', minWidth: '300px', minHeight: '300px' }}>
-                {renderTextPreview()}
-                {renderCounter()}
-                {renderLoader()}
-                {renderWebcam()}
-                {renderPreview()}
+        <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
+            <div style={{ marginRight: 20 }}>
+                <div style={{ marginLeft: '16px' }}>
+                    <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h5">
+                        Preview
+                    </Typography>
+                    {renderPreviewHeader()}
+                    <div style={{ width: 'fit-content', minWidth: '300px', minHeight: '300px' }}>
+                        {renderTextPreview()}
+                        {renderCounter()}
+                        {renderLoader()}
+                        <div
+                            className={classes.videoContainer}
+                            style={{ minWidth: previewSize.width, minHeight: `${previewSize.height}px` }}
+                        >
+                            {renderWebcam()}
+                            {renderPreview()}
+                        </div>
+                        {renderPreviewButton()}
+                    </div>
+                </div>
             </div>
-        </div>
+            <Grid item style={{ marginTop: '40px' }}>
+                <CreateForm tabIndex={0} />
+            </Grid>
+        </Grid>
     )
 }

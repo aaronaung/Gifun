@@ -11,9 +11,9 @@ function useCameraContext() {
 }
 
 function CameraProvider(props) {
-    const [cameraState, setCameraState] = React.useState({ on: false, loading: false })
+    const [cameraState, setCameraState] = React.useState({ show: true, loading: true })
 
-    const value = [cameraState, setCameraState]
+    const value = { cameraState, setCameraState }
     return <CameraContext.Provider value={value} {...props} />
 }
 

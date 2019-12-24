@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'wrap',
+        zIndex: 10,
     },
 }))
 

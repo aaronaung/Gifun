@@ -4,6 +4,8 @@ const INITIAL_STATE = {
     b64: '',
     saved: false,
     shareableLink: '',
+    pending: false,
+    properties: {},
 }
 const PreviewReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {

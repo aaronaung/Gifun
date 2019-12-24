@@ -14,9 +14,10 @@ import '../vendors/flickity.css'
 import CreateForm from './CreateForm'
 import MyDropzone from './Dropzone'
 import PreviewCard from './PreviewCard'
-import WebcamPreview from './WebCamPreview'
-import ImagesPreview from './ImagesPreview'
+import WebcamTabContent from './WebcamTabContent'
+import ImagesTabContent from './ImagesTabContent'
 import { getExif } from '../services/utils'
+import { useCameraContext } from '../contexts/CameraContext'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -87,19 +88,12 @@ const CreateGifs = props => {
     const [images, setImages] = useState([])
     const testRef = useRef(null)
 
-    const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-        setTabValue(newValue)
-        setImages([])
-    }
-
     const handleFilesChange = images => {
         let imgs = Object.keys(images).map(id => {
             const img = document.createElement('img')
             if (isMobile) {
                 img.style.transform = 'rotate(90deg)'
             }
-            // const exif = await getExif(images[id].split(',')[1])
-            // alert(JSON.stringify(exif))
             img.src = images[id]
             return img
         })
@@ -110,40 +104,11 @@ const CreateGifs = props => {
         <Grid container spacing={3} className={classes.main}>
             <Grid item xs={12} lg={12}>
                 <TabPanel value={tabState} index={0}>
-                    <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-                        <div style={{ marginRight: 20 }}>
-                            <WebcamPreview />
-                        </div>
-                        {tabState === 0 ? (
-                            <Grid item style={{ marginTop: '40px' }}>
-                                <CreateForm tabIndex={0} />
-                            </Grid>
-                        ) : (
-                            ''
-                        )}
-                    </Grid>
+                    {tabState === 0 ? <WebcamTabContent /> : ''}
                 </TabPanel>
                 <TabPanel value={tabState} index={1}>
-                    <div ref={testRef}></div>
-                    {tabState === 1 ? (
-                        <div>
-                            <MyDropzone onChange={handleFilesChange}></MyDropzone>
-                            <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-                                <ImagesPreview images={images} />
-                                <Grid item>
-                                    <CreateForm tabIndex={1} />
-                                </Grid>
-                            </Grid>
-                        </div>
-                    ) : (
-                        ''
-                    )}
+                    {tabState === 1 ? <ImagesTabContent /> : ''}
                 </TabPanel>
-                {/* <TabPanel value={tabState} index={2}>
-                    <Typography color="textSecondary" className={classes.tabs}>
-                        Coming soon...
-                    </Typography>
-                </TabPanel> */}
             </Grid>
         </Grid>
     )

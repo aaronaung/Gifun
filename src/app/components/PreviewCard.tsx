@@ -87,12 +87,11 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
 
     const [saving, setSaving] = useState(false)
     const [openShareModal, setOpenShareModal] = useState(false)
-    const [cameraState, setCameraState] = useCameraContext()
 
     const { identityAddress: userId } = getUser()
     const { openSnackbar } = useSnackbarContext()
     const dispatch = useDispatch()
-    const { b64, saved, shareableLink } = useSelector(state => previewSelector(state))
+    const { b64, saved, shareableLink, pending } = useSelector(state => previewSelector(state))
     const [showDefault, setShowDefault] = useState(true)
 
     const handleSavePreview = async () => {
@@ -115,7 +114,6 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
     }
 
     const handleRemovePreview = () => {
-        setCameraState({ on: false, loading: true })
         dispatch(removePreview())
     }
 
