@@ -43,7 +43,8 @@
         "redux-thunk": "^2.3.0",
         "rxjs": "^6.5.3",
         "slick-carousel": "^1.8.1",
-        "throttle-debounce": "^2.1.0"
+        "throttle-debounce": "^2.1.0",
+        "use-visibility-change": "^0.3.0"
     },
     "keywords": [
         "gatsby"

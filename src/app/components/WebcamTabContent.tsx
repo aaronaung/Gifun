@@ -28,6 +28,8 @@ import Loading from './Loader'
 import TextPreview from './TextPreview'
 import { isMobile } from 'react-device-detect'
 import CreateForm from './CreateForm'
+import useOnScreen from '../hooks/useOnScreen'
+import useVisibilityChange from 'use-visibility-change'
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -148,7 +150,8 @@ export default function WebcamPreview() {
     const classes = useStyles()
     const dispatch = useDispatch()
     const webcamRef = useRef(null)
-
+    const camContainerRef = useRef(null)
+    const onScreen = useOnScreen(camContainerRef)
     /** State variables */
     const [previewSize, setPreviewSize] = useState({ width: 300, height: 300 })
     // const [camLoading, setCamLoading] = useState(true)
@@ -163,6 +166,16 @@ export default function WebcamPreview() {
 
     const { pending, b64, properties } = useSelector(state => previewSelector(state))
     const { formValues, formErrors } = useSelector(state => formSelector(state))
+
+    const onShow = () => {
+        setCamState(prev => ({ ...prev, show: true }))
+    }
+
+    const onHide = () => {
+        setCamState(prev => ({ loading: true, show: false }))
+    }
+
+    useVisibilityChange({ onShow, onHide })
 
     useEffect(() => {
         if (webcamRef.current) {
@@ -278,7 +291,7 @@ export default function WebcamPreview() {
     }
 
     const renderWebcam = () => {
-        if (camState.show)
+        if (camState.show && onScreen)
             return (
                 <Webcam
                     style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px', position: 'absolute' }}
@@ -308,7 +321,7 @@ export default function WebcamPreview() {
 
     return (
         <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
-            <div style={{ marginLeft: 16, marginRight: 30 }}>
+            <div style={{ marginLeft: 16, marginRight: 30 }} ref={camContainerRef}>
                 {b64 ? (
                     <Typography style={{ marginBottom: '15px' }} color="textSecondary" variant="h6">
                         Preview
