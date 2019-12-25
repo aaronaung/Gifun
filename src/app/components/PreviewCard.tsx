@@ -53,7 +53,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         },
     },
     savingOverlay: {
-        opacity: 0.2,
+        position: 'absolute',
+        background: 'black',
+        opacity: 0.5,
     },
     savingLoader: {
         position: 'absolute',
@@ -78,6 +80,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         height: '100%',
         padding: 40,
         color: theme.palette.secondary.main,
+    },
+    displayNone: {
+        display: 'none',
     },
 }))
 
@@ -115,6 +120,7 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
 
     const handleRemovePreview = () => {
         dispatch(removePreview())
+        dispatch(setSaved(false, ''))
     }
 
     useEffect(() => {
@@ -134,8 +140,11 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
                     <div style={{ display: `${showDefault ? 'flex' : 'none'}` }} className={classes.defaultContent}>
                         {defaultContent}
                     </div>
+                    <div
+                        className={clsx([saving ? '' : classes.displayNone, classes.savingOverlay])}
+                        style={{ width: gifWidth, height: gifHeight }}
+                    ></div>
                     <CardMedia
-                        className={clsx(saving ? classes.savingOverlay : '')}
                         image={gifB64 || `data:image/jpeg;base64,`}
                         title="Gifun Preview"
                         style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }}

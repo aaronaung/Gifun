@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: 250,
+        height: 200,
     },
     fileIcon: {
         marginRight: 10,

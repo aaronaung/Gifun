@@ -151,7 +151,9 @@ export default function WebcamPreview() {
 
     /** State variables */
     const [previewSize, setPreviewSize] = useState({ width: 300, height: 300 })
-    const [camLoading, setCamLoading] = useState(true)
+    // const [camLoading, setCamLoading] = useState(true)
+    // const [showCam, setShowCam] = useState(true)
+    const [camState, setCamState] = useState({ show: true, loading: true })
     const { openSnackbar } = useSnackbarContext()
     const [counter, setCounter] = useState(3)
     const [showText, setShowText] = useState(true)
@@ -233,7 +235,7 @@ export default function WebcamPreview() {
     }
 
     const renderTextPreview = () => {
-        if (!b64 && !camLoading && showText && Object.keys(formErrors).length === 0) {
+        if (!b64 && !camState.loading && showText && Object.keys(formErrors).length === 0) {
             return <TextPreview previewSize={previewSize} />
         }
     }
@@ -249,12 +251,12 @@ export default function WebcamPreview() {
     }
 
     const renderLoader = () => {
-        if ((pending && !previewState.recording && !previewState.counting) || camLoading) {
+        if ((pending && !previewState.recording && !previewState.counting) || camState.loading) {
             return <Loading width={previewSize.width} height={previewSize.height} />
         }
     }
     const renderPreviewButton = () => {
-        if (!camLoading && !b64)
+        if (!camState.loading && !b64)
             return (
                 <Button
                     className={classes.generateBtn}
@@ -276,25 +278,26 @@ export default function WebcamPreview() {
     }
 
     const renderWebcam = () => {
-        return (
-            <Webcam
-                style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px', position: 'absolute' }}
-                ref={webcamRef}
-                videoConstraints={{ width: formValues.gifWidth, height: formValues.gifHeight }}
-                onUserMedia={() => {
-                    if (webcamRef && webcamRef.current && webcamRef.current.video) {
-                        webcamRef.current.video.onplaying = () => {
-                            let newDimensions = {
-                                width: webcamRef.current.video.videoWidth,
-                                height: webcamRef.current.video.videoHeight,
+        if (camState.show)
+            return (
+                <Webcam
+                    style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px', position: 'absolute' }}
+                    ref={webcamRef}
+                    videoConstraints={{ width: formValues.gifWidth, height: formValues.gifHeight }}
+                    onUserMedia={() => {
+                        if (webcamRef && webcamRef.current && webcamRef.current.video) {
+                            webcamRef.current.video.onplaying = () => {
+                                let newDimensions = {
+                                    width: webcamRef.current.video.videoWidth,
+                                    height: webcamRef.current.video.videoHeight,
+                                }
+                                setCamState(prev => ({ ...prev, loading: false }))
+                                setPreviewSize(newDimensions)
                             }
-                            setCamLoading(false)
-                            setPreviewSize(newDimensions)
                         }
-                    }
-                }}
-            ></Webcam>
-        )
+                    }}
+                ></Webcam>
+            )
     }
 
     const renderPreview = () => {

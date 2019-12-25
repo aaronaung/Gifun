@@ -18,6 +18,7 @@ import WebcamTabContent from './WebcamTabContent'
 import ImagesTabContent from './ImagesTabContent'
 import { getExif } from '../services/utils'
 import { useCameraContext } from '../contexts/CameraContext'
+import VideosTabContent from './VideosTabContent'
 
 interface TabPanelProps {
     children?: React.ReactNode
@@ -108,6 +109,9 @@ const CreateGifs = props => {
                 </TabPanel>
                 <TabPanel value={tabState} index={1}>
                     {tabState === 1 ? <ImagesTabContent /> : ''}
+                </TabPanel>
+                <TabPanel value={tabState} index={2}>
+                    {tabState === 2 ? <VideosTabContent /> : ''}
                 </TabPanel>
             </Grid>
         </Grid>
