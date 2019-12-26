@@ -1,4 +1,14 @@
-import { createStyles, InputAdornment, makeStyles, MenuItem, TextField, Theme, Tooltip, Typography } from '@material-ui/core'
+import {
+    createStyles,
+    InputAdornment,
+    makeStyles,
+    MenuItem,
+    TextField,
+    Theme,
+    Tooltip,
+    Typography,
+    Popover,
+} from '@material-ui/core'
 import VerticalAlignCenterIcon from '@material-ui/icons/VerticalAlignCenter'
 import { Autocomplete } from '@material-ui/lab'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -10,6 +20,7 @@ import { previewSelector } from '../redux/preview/preview.selector'
 import { generateGif } from '../services/gif.service'
 import { debounce } from 'throttle-debounce'
 import { useTabContext } from '../contexts/TabContext'
+import { SketchPicker } from 'react-color'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -91,9 +102,12 @@ const formValidationFunctions = {
 const CreateForm = ({ tabIndex }) => {
     const classes = useStyles()
     const dispatch = useDispatch()
-    const xRef = useRef()
-    const yRef = useRef()
+    const xRef = useRef(null)
+    const yRef = useRef(null)
+    const colorRef = useRef(null)
     const [inputState, setInputState] = useState({ e: null, key: null })
+    const [openColorPicker, setOpenColorPicker] = useState(false)
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
     const { tabState } = useTabContext()
     const { pending } = useSelector(state => previewSelector(state))
     const { formValues, formErrors } = useSelector(state => formSelector(state))
@@ -134,8 +148,36 @@ const CreateForm = ({ tabIndex }) => {
         }
     }, [formValues])
 
+    const openColorPickerDialog = e => {
+        setAnchorEl(e.currentTarget)
+    }
+
+    const handleColorPickerComplete = color => {
+        colorRef.current.value = color.hex
+        setOpenColorPicker(false)
+        dispatch(updateFormValues({ fontColor: color.hex }))
+    }
+
+    const open = Boolean(anchorEl)
+
     return (
         <div>
+            <Popover
+                id={`color-picker`}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+            >
+                <SketchPicker color={formValues['fontColor']} onChangeComplete={handleColorPickerComplete}></SketchPicker>
+            </Popover>
             <form className={classes.root}>
                 <TextField
                     id={`width-${tabIndex}`}
@@ -302,6 +344,7 @@ const CreateForm = ({ tabIndex }) => {
                     }}
                 />
                 <TextField
+                    inputRef={colorRef}
                     id={`fontColor-${tabIndex}`}
                     label="Font Color"
                     error={formErrors['fontColor']}
@@ -310,6 +353,19 @@ const CreateForm = ({ tabIndex }) => {
                     defaultValue={'#ffffff'}
                     InputProps={{
                         startAdornment: <InputAdornment position="start">HEX</InputAdornment>,
+                        endAdornment: (
+                            <InputAdornment position="end" onClick={openColorPickerDialog}>
+                                <div
+                                    style={{
+                                        cursor: 'pointer',
+                                        width: 20,
+                                        height: 20,
+                                        borderRadius: 3,
+                                        backgroundColor: formValues['fontColor'],
+                                    }}
+                                ></div>
+                            </InputAdornment>
+                        ),
                     }}
                 />
                 <Autocomplete
