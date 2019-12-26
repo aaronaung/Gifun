@@ -9,7 +9,7 @@ const INITIAL_STATE = {
         gifWidth: 300,
         fontSize: 20,
         fontColor: '#ffffff',
-        text: 'Hello World',
+        text: '',
         fontFamily: 'Arial',
         fontWeight: 'normal',
         frameDuration: 0.1,

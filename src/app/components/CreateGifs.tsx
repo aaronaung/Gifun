@@ -87,7 +87,6 @@ const CreateGifs = props => {
     /** State variables */
     const { tabState, setTabState } = useTabContext()
     const [images, setImages] = useState([])
-    const testRef = useRef(null)
 
     const handleFilesChange = images => {
         let imgs = Object.keys(images).map(id => {

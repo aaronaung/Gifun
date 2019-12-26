@@ -71,9 +71,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderTopRightRadius: '0px',
         height: '50px',
     },
-    'video::-webkit-media-controls-overlay-play-button': {
-        display: 'none',
-    },
     counterOverlay: {
         display: 'flex',
         position: 'absolute',
@@ -111,11 +108,15 @@ const useStyles = makeStyles((theme: Theme) => ({
         transform: 'translate(-50%,-50%)',
         color: theme.palette.secondary.main,
         animation: 'none',
+        zIndex: 100,
     },
     shareBtn: {
         '&:hover .MuiSvgIcon-root': {
             color: `white !important`,
         },
+    },
+    '.media-controls-container': {
+        display: 'none',
     },
 }))
 
@@ -151,11 +152,9 @@ export default function WebcamPreview() {
     const dispatch = useDispatch()
     const webcamRef = useRef(null)
     const camContainerRef = useRef(null)
-    const onScreen = useOnScreen(camContainerRef)
+
     /** State variables */
     const [previewSize, setPreviewSize] = useState({ width: 300, height: 300 })
-    // const [camLoading, setCamLoading] = useState(true)
-    // const [showCam, setShowCam] = useState(true)
     const [camState, setCamState] = useState({ show: true, loading: true })
     const { openSnackbar } = useSnackbarContext()
     const [counter, setCounter] = useState(3)
@@ -291,7 +290,7 @@ export default function WebcamPreview() {
     }
 
     const renderWebcam = () => {
-        if (camState.show && onScreen)
+        if (camState.show)
             return (
                 <Webcam
                     style={{ borderTopLeftRadius: '4px', borderTopRightRadius: '4px', position: 'absolute' }}

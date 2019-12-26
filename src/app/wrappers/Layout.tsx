@@ -209,7 +209,7 @@ export default function MiniDrawer({ children }) {
                                 >
                                     <Tab label="Webcam" {...a11yProps(0)} />
                                     <Tab label="Images" {...a11yProps(1)} />
-                                    <Tab label="Video" {...a11yProps(2)} />
+                                    {/* <Tab label="Video" {...a11yProps(2)} /> */}
                                 </Tabs>
                             )
                         }

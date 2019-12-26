@@ -164,7 +164,7 @@ const CreateForm = ({ tabIndex }) => {
                     id={`text-${tabIndex}`}
                     label="Text"
                     error={formErrors['text']}
-                    defaultValue="Hello World"
+                    defaultValue=""
                     onChange={e => onInputChange(e, 'text')}
                 />
 
