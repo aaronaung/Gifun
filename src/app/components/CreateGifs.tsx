@@ -109,9 +109,9 @@ const CreateGifs = props => {
                 <TabPanel value={tabState} index={1}>
                     {tabState === 1 ? <ImagesTabContent /> : ''}
                 </TabPanel>
-                <TabPanel value={tabState} index={2}>
+                {/* <TabPanel value={tabState} index={2}>
                     {tabState === 2 ? <VideosTabContent /> : ''}
-                </TabPanel>
+                </TabPanel> */}
             </Grid>
         </Grid>
     )

@@ -129,6 +129,8 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
         } else {
             setShowDefault(true)
         }
+
+        return () => {}
     }, [gifB64])
 
     return (
@@ -142,7 +144,7 @@ export default function PreviewCard({ gifProperties, gifB64, defaultContent, hid
                     </div>
                     <div
                         className={clsx([saving ? '' : classes.displayNone, classes.savingOverlay])}
-                        style={{ width: gifWidth, height: gifHeight }}
+                        style={{ height: `${gifHeight}px`, width: `${gifWidth}px` }}
                     ></div>
                     <CardMedia
                         image={gifB64 || `data:image/jpeg;base64,`}

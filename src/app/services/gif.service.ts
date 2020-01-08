@@ -29,7 +29,7 @@ const _massageGIFProps = props => {
         delete newProps.textYCoordinate
     }
     newProps.frameDuration = props.frameDuration * 10
-    newProps = { ...newProps, fontSize: `${props.fontSize || 20}px`, numFrames: 15, sampleInterval: 8 }
+    newProps = { ...newProps, fontSize: `${props.fontSize || 20}px`, numFrames: 15, sampleInterval: 1 }
     return newProps
 }
 

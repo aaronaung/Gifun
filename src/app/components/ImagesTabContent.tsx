@@ -10,7 +10,7 @@ import { previewSelector } from '../redux/preview/preview.selector'
 import { isMobile } from 'react-device-detect'
 import { getExif } from '../services/utils'
 import { updateFormValues, resetForm } from '../redux/form/form.action'
-import MyDropzone from './Dropzone'
+import ImageDropzone from './ImageDropzone'
 import CreateForm from './CreateForm'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -95,7 +95,7 @@ export default function ImagesTabContent() {
 
     return (
         <div>
-            <MyDropzone onChange={handleFilesChange}></MyDropzone>
+            <ImageDropzone onChange={handleFilesChange}></ImageDropzone>
             <Grid container style={{ width: '100vw', flexWrap: 'wrap' }}>
                 <div className={classes.imageContainer}>
                     <PreviewCard

@@ -2,6 +2,8 @@ import React, { Fragment } from 'react'
 import Helmet from 'react-helmet'
 import { navigate } from 'gatsby'
 import { handleLogin } from '../src/app/services/auth'
+import exampleGifOne from '../static/img/gifOne.gif'
+import exampleGifTwo from '../static/img/gifTwo.gif'
 
 export const LandingPage = () => {
     return (
@@ -89,17 +91,17 @@ export const LandingPage = () => {
                     </div>
                 </header>
 
-                <section className="features" id="features">
+                <section className="features" id="features" style={{ padding: 80 }}>
                     <div className="container">
                         <div className="section-heading text-center">
-                            <h2>Secure, Private, and Fun</h2>
+                            <h2>Secure, Free, and Fun</h2>
                             <p className="text-muted">Have fun creating and rest assured your data is secure</p>
                         </div>
                         <div className="row">
                             <div className="col-lg-12 my-auto">
                                 <div className="container-fluid">
                                     <div className="row">
-                                        <div className="col-lg-6">
+                                        <div className="col-lg-3">
                                             <div className="feature-item">
                                                 <i className="icon-user text-primary"></i>
                                                 <h3>Private</h3>
@@ -108,26 +110,26 @@ export const LandingPage = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6">
+                                        <div className="col-lg-3">
                                             <div className="feature-item">
                                                 <i className="icon-lock text-primary"></i>
                                                 <h3>Secure</h3>
                                                 <p className="text-muted">
-                                                    All the sensitive data is encrypted and uploaded to a decentralized network
-                                                    powered by blockchain technology. No one but you can access your data
+                                                    Your data is encrypted and uploaded to a decentralized storage system. No one
+                                                    but you can access your data
                                                 </p>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-lg-6">
+                                        {/* </div> */}
+                                        {/* <div className="row"> */}
+                                        <div className="col-lg-3">
                                             <div className="feature-item">
                                                 <i className="icon-present text-primary"></i>
                                                 <h3>Free to Use</h3>
                                                 <p className="text-muted">It's a gift</p>
                                             </div>
                                         </div>
-                                        <div className="col-lg-6">
+                                        <div className="col-lg-3">
                                             <div className="feature-item">
                                                 <i className="icon-heart text-primary"></i>
                                                 <h3>Fun</h3>
@@ -144,10 +146,38 @@ export const LandingPage = () => {
                     </div>
                 </section>
 
+                {/* <section className="explore" style={{ paddingTop: 0 }}>
+                    <div className="container">
+                        <div className="section-heading text-center">
+                            <h2 style={{ color: 'black' }}>Explore</h2>
+                            <p className="text-muted">
+                                Discover how people are using <b>GIFun</b>
+                            </p>
+                        </div>
+                        <div className="row" style={{ justifyContent: 'center' }}>
+                            <div className="col-lg-2">
+                                <img src="img/gifOne.gif" style={{ borderRadius: 10, width: '110%' }} alt="" />
+                            </div>
+                            <div className="col-lg-2">
+                                <img src="img/gifTwo.gif" style={{ borderRadius: 10, width: '110%' }} alt="" />
+                            </div>
+                            <div className="col-lg-2">
+                                <img src="img/gifOne.gif" style={{ borderRadius: 10, width: '110%' }} alt="" />
+                            </div>
+                            <div className="col-lg-2">
+                                <img src="img/gifTwo.gif" style={{ borderRadius: 10, width: '110%' }} alt="" />
+                            </div>
+                            <div className="col-lg-2">
+                                <img src="img/gifOne.gif" style={{ borderRadius: 10, width: '110%' }} alt="" />
+                            </div>
+                        </div>
+                    </div>
+                </section> */}
+
                 <section className="contact" style={{ backgroundColor: '#222222', padding: 50 }} id="contact">
                     <div className="container">
                         {/* <h2 style={{ color: 'white' }}>Contact Us</h2> */}
-                        <a href="mailto:team@gifun" className="btn btn-outline btn-xl js-scroll-trigger">
+                        <a href="mailto:gifunforfriends@gmail.com" className="btn btn-outline btn-xl js-scroll-trigger">
                             Contact Us
                         </a>
                     </div>
