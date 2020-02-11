@@ -13,6 +13,7 @@ import { CameraProvider } from './contexts/CameraContext.tsx'
 import { SnackbarProvider } from './contexts/SnackbarContext'
 import { red, green, yellow, blue, grey } from '@material-ui/core/colors'
 import { TabProvider } from './contexts/TabContext'
+import Betfame from './components/Betfame'
 
 const theme = createMuiTheme({
     palette: {
@@ -46,6 +47,7 @@ const App = () => {
                                     <PrivateRoute path="/app" component={Gifs} />
                                     <PublicRoute path="/app/create" component={CreateGifs} />
                                     <PrivateRoute path="/" default={true} component={NotFound} />
+                                    <PublicRoute path="/app/isasecret" component={Betfame} />
                                 </Router>
                             </Layout>
                         </CameraProvider>
