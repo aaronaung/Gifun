@@ -47,7 +47,6 @@ const App = () => {
                                     <PrivateRoute path="/app" component={Gifs} />
                                     <PublicRoute path="/app/create" component={CreateGifs} />
                                     <PrivateRoute path="/" default={true} component={NotFound} />
-                                    <PublicRoute path="/app/isasecret" component={Betfame} />
                                 </Router>
                             </Layout>
                         </CameraProvider>
