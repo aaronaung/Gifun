@@ -1,6 +1,7 @@
 import React from 'react'
 import MaterialTable, { Column } from 'material-table'
-import data from './data'
+import seniors from './betfame/seniors'
+import premiums from './betfame/premiums'
 import { forwardRef } from 'react'
 
 import AddBox from '@material-ui/icons/AddBox'
@@ -65,16 +66,27 @@ export default function Betfame() {
             { title: 'Losses', field: 'losses', type: 'numeric' },
             { title: 'Draws', field: 'draws', type: 'numeric' },
         ],
-        data,
+        seniors,
+        premiums,
     })
 
     return (
-        <MaterialTable
-            icons={tableIcons}
-            title="Editable Example"
-            options={{ pageSize: 10 }}
-            columns={state.columns}
-            data={state.data}
-        />
+        <>
+            <MaterialTable
+                style={{ marginBottom: 20 }}
+                icons={tableIcons}
+                title="Senior Tipsters"
+                options={{ pageSize: 10 }}
+                columns={state.columns}
+                data={state.seniors}
+            />
+            <MaterialTable
+                icons={tableIcons}
+                title="Premium Tipsters"
+                options={{ pageSize: 10 }}
+                columns={state.columns}
+                data={state.premiums}
+            />
+        </>
     )
 }
