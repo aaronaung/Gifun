@@ -19,6 +19,10 @@ import Remove from '@material-ui/icons/Remove'
 import SaveAlt from '@material-ui/icons/SaveAlt'
 import Search from '@material-ui/icons/Search'
 import ViewColumn from '@material-ui/icons/ViewColumn'
+import { FormControl, Select, MenuItem, InputLabel, Typography } from '@material-ui/core'
+import overUnderStats from './betfame/overunder'
+import { makeStyles, createStyles } from '@material-ui/styles'
+import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts'
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -70,8 +74,65 @@ export default function Betfame() {
         premiums,
     })
 
+    const getOverUnderData = tipster => {
+        let data = overUnderStats[tipster]
+        let result = { OVER: [], UNDER: [] }
+        for (let tipType in data) {
+            for (let tipGoal in data[tipType]) {
+                let r = { name: tipGoal, total: data[tipType][tipGoal].count, wins: data[tipType][tipGoal].wins }
+                result[tipType].push(r)
+            }
+        }
+        return result
+    }
+
+    const tipsters = Object.keys(overUnderStats)
+    const { OVER, UNDER } = getOverUnderData(tipsters[0])
+    const [currentTipster, setCurrentTipster] = React.useState(tipsters[0])
+    const [overData, setOverData] = React.useState(OVER)
+    const [underData, setUnderData] = React.useState(UNDER)
+
+    const handleChange = e => {
+        setCurrentTipster(e.target.value)
+        let overUnderData = getOverUnderData(e.target.value)
+        setOverData(overUnderData.OVER)
+        setUnderData(overUnderData.UNDER)
+    }
+
     return (
         <>
+            <FormControl style={{ marginBottom: 20 }}>
+                <InputLabel id="demo-simple-select-label">Tipster</InputLabel>
+                <Select labelId="demo-simple-select-label" id="demo-simple-select" value={currentTipster} onChange={handleChange}>
+                    {tipsters.map(tipster => (
+                        <MenuItem value={tipster}>{tipster}</MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            <Typography variant="h6" style={{ marginBottom: 20 }}>
+                Over
+            </Typography>
+            <BarChart width={730} height={250} data={overData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="total" fill="#8884d8" />
+                <Bar dataKey="wins" fill="#82ca9d" />
+            </BarChart>
+            <Typography variant="h6" style={{ marginBottom: 20 }}>
+                Under
+            </Typography>
+            <BarChart width={730} height={250} data={underData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="total" fill="#8884d8" />
+                <Bar dataKey="wins" fill="#82ca9d" />
+            </BarChart>
             <MaterialTable
                 style={{ marginBottom: 20 }}
                 icons={tableIcons}
