@@ -28,7 +28,7 @@ var getStatsForTipsters = () => {
     return JSON.stringify(allTipsters)
 }
 
-var getTotalGoalStats = () => {
+var getOverUnderStats = () => {
     let tipsterName = document.querySelector('.tipster-profile .pdesc h2').innerHTML
     let listItems = [...document.querySelectorAll('.perlist li')]
     let data = {}
@@ -78,4 +78,91 @@ var getTotalGoalStats = () => {
     })
 }
 
-getTotalGoalStats()
+var _getListItemsbyTipType = (listItems, tipType) => {
+    return listItems
+        .filter(listItem => {
+            return listItem.querySelector('.type').innerHTML === tipType && listItem.querySelector('.tip p').innerHTML !== '-'
+        })
+        .map(li => {
+            let tip = li.querySelector('.tip p').innerHTML
+            let tipType = tip.match(/^[a-zA-Z\s]*/g).join('')
+            let tipGoals = parseFloat(_stripOutOdds(tip))
+            let betResult = li.querySelector('.result i') ? li.querySelector('.result i').innerHTML : 'Pending'
+            tipType = tipType.toUpperCase()
+            if (isNaN(tipGoals)) {
+                console.log('NAN TIPGOAL:', li)
+            }
+            return {
+                tipType,
+                tipGoals,
+                betResult,
+            }
+        })
+        .filter(r => r.tipType !== 'POSTPONED' && r.tipGoals !== NaN && r.betResult !== 'VOID')
+}
+
+var getAsianHandicapStats = () => {
+    let tipsterName = document.querySelector('.tipster-profile .pdesc h2').innerHTML
+    let listItems = [...document.querySelectorAll('.perlist li')]
+    let data = {}
+
+    let fullAsianHandicaps = _getListItemsbyTipType(listItems, '<p>Asian Handicap<br>Full Time</p>')
+    let halfAsianHandicaps = _getListItemsbyTipType(listItems, '<p>Asian Handicap<br>Half Time</p>')
+
+    let detail = { full: {}, half: {} }
+
+    fullAsianHandicaps.forEach(t => {
+        detail['full'][t.tipGoals] = {
+            count:
+                detail['full'][t.tipGoals] && detail['full'][t.tipGoals]['count'] !== undefined
+                    ? detail['full'][t.tipGoals]['count']
+                    : 0,
+            wins:
+                detail['full'][t.tipGoals] && detail['full'][t.tipGoals]['wins'] !== undefined
+                    ? detail['full'][t.tipGoals]['wins']
+                    : 0,
+        }
+        if (t.betResult.toUpperCase() === 'WIN') {
+            detail['full'][t.tipGoals]['wins'] += 1
+        }
+        detail['full'][t.tipGoals]['count'] += 1
+    })
+
+    halfAsianHandicaps.forEach(t => {
+        detail['half'][t.tipGoals] = {
+            count:
+                detail['half'][t.tipGoals] && detail['half'][t.tipGoals]['count'] !== undefined
+                    ? detail['half'][t.tipGoals]['count']
+                    : 0,
+            wins:
+                detail['half'][t.tipGoals] && detail['half'][t.tipGoals]['wins'] !== undefined
+                    ? detail['half'][t.tipGoals]['wins']
+                    : 0,
+        }
+        if (t.betResult.toUpperCase() === 'WIN') {
+            detail['half'][t.tipGoals]['wins'] += 1
+        }
+        detail['half'][t.tipGoals]['count'] += 1
+    })
+
+    return JSON.stringify({
+        [tipsterName]: {
+            // tips: fullTimeTotalGoals,
+            ...detail,
+        },
+    })
+}
+
+var _stripOutOdds = fullstr => {
+    let stack = []
+    for (let i = fullstr.length - 1; i > 0; i--) {
+        if (fullstr[i].match(/\d/g) || fullstr[i] === '+' || fullstr[i] === '-' || fullstr[i] === '.') {
+            stack.unshift(fullstr[i])
+        } else {
+            break
+        }
+    }
+    return stack.join('')
+}
+
+getAsianHandicapStats()

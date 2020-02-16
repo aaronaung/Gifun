@@ -1,0 +1,42 @@
+export default {
+    'Felix Drechsler': {
+        full: {
+            '0': { count: 1, wins: 1 },
+            '1': { count: 1, wins: 1 },
+            '-0.5': { count: 1, wins: 1 },
+            '0.25': { count: 2, wins: 2 },
+            '-1': { count: 2, wins: 2 },
+            '-1.5': { count: 1, wins: 1 },
+            '0.5': { count: 1, wins: 1 },
+            '-0.75': { count: 1, wins: 1 },
+        },
+        half: {
+            '0.25': { count: 4, wins: 4 },
+            '-0.75': { count: 4, wins: 2 },
+            '-0.25': { count: 3, wins: 3 },
+            NaN: { count: 1, wins: 1 },
+        },
+    },
+    'Rasmus Kovalainen': {
+        full: {
+            '0': { count: 68, wins: 52 },
+            '1': { count: 15, wins: 15 },
+            '0.5': { count: 64, wins: 63 },
+            '0.25': { count: 181, wins: 141 },
+            '-0.5': { count: 100, wins: 94 },
+            '-0.75': { count: 114, wins: 88 },
+            '-0.25': { count: 77, wins: 74 },
+            '-1.5': { count: 12, wins: 10 },
+            '0.75': { count: 46, wins: 43 },
+            '1.5': { count: 17, wins: 17 },
+            '-1.25': { count: 21, wins: 18 },
+            '1.25': { count: 40, wins: 38 },
+            '-1': { count: 20, wins: 17 },
+            '-1.75': { count: 5, wins: 3 },
+            '-2.25': { count: 2, wins: 1 },
+            '-2': { count: 1, wins: 1 },
+            '-3.25': { count: 1, wins: 0 },
+        },
+        half: {},
+    },
+}
