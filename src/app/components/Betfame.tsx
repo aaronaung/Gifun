@@ -58,6 +58,7 @@ interface TableState {
 }
 
 function BarStats({ data, title }) {
+    data = data.sort((a, b) => a.name - b.name)
     const renderStats = () => {
         if (data.length === 0) {
             return (
@@ -80,7 +81,7 @@ function BarStats({ data, title }) {
             return (
                 <BarChart width={600} height={250} data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
