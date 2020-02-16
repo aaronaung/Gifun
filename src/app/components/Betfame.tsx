@@ -78,7 +78,7 @@ function BarStats({ data, title }) {
             )
         } else {
             return (
-                <BarChart width={730} height={250} data={data}>
+                <BarChart width={600} height={250} data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -161,18 +161,18 @@ function TipstersStats({ stats, tabIndex }) {
                 />
             </div>
             <Grid container spacing={2} style={{ marginBottom: 15 }}>
-                <Grid item lg={6}>
+                <Grid item md={12} lg={6}>
                     <BarStats title="Total Goals Over" data={overUnderData.OVER}></BarStats>
                 </Grid>
-                <Grid item lg={6}>
+                <Grid item md={12} lg={6}>
                     <BarStats title="Total Goals Under" data={overUnderData.UNDER}></BarStats>
                 </Grid>
             </Grid>
             <Grid container spacing={2} style={{ marginBottom: 15 }}>
-                <Grid item lg={6}>
+                <Grid item md={12} lg={6}>
                     <BarStats title="Asian Handicap Full" data={asianHandicapData.full}></BarStats>
                 </Grid>
-                <Grid item lg={6}>
+                <Grid item md={12} lg={6}>
                     <BarStats title="Asian Handicap Half" data={asianHandicapData.half}></BarStats>
                 </Grid>
             </Grid>
