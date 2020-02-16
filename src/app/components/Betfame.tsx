@@ -58,23 +58,56 @@ interface TableState {
 }
 
 function BarStats({ data, title }) {
+    const renderStats = () => {
+        if (data.length === 0) {
+            return (
+                <Box
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: 200,
+                        width: '100%',
+                        background: 'grey',
+                    }}
+                >
+                    <Typography variant="subtitle1" style={{ textAlign: 'center', color: 'white' }}>
+                        No Data
+                    </Typography>
+                </Box>
+            )
+        } else {
+            return (
+                <BarChart width={730} height={250} data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total" fill="#8884d8" />
+                    <Bar dataKey="wins" fill="#82ca9d" />
+                </BarChart>
+            )
+        }
+    }
     return (
         <>
             <Typography variant="h6" style={{ marginBottom: 20 }}>
                 {title}
             </Typography>
-            <BarChart width={730} height={250} data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="total" fill="#8884d8" />
-                <Bar dataKey="wins" fill="#82ca9d" />
-            </BarChart>
+            {renderStats()}
         </>
     )
 }
+
+const useStyles = makeStyles((theme: Theme) => ({
+    main: {
+        '& .MuiInputBase-root': {
+            width: 300,
+            marginBottom: 20,
+        },
+    },
+}))
 
 function TipstersStats({ stats, tabIndex }) {
     const getTableData = (tipster, type) => {
@@ -97,7 +130,7 @@ function TipstersStats({ stats, tabIndex }) {
         }
         return result
     }
-
+    const classes = useStyles()
     const tipsters = Object.keys(stats.asianHandicapStats)
     const initialOverUnderData = getTableData(tipsters[0], 'overUnder')
     const initialAsianHandicapData = getTableData(tipsters[0], 'asianHandicap')
@@ -116,7 +149,7 @@ function TipstersStats({ stats, tabIndex }) {
 
     return (
         <>
-            <FormControl style={{ marginBottom: 20 }}>
+            <div className={classes.main}>
                 <Autocomplete
                     id={`tipsters-select-${tabIndex}`}
                     options={tipsters}
@@ -126,7 +159,7 @@ function TipstersStats({ stats, tabIndex }) {
                     style={{ width: 200, display: 'inline-flex' }}
                     renderInput={params => <TextField {...params} label="Tipsters" variant="outlined" fullWidth />}
                 />
-            </FormControl>
+            </div>
             <Grid container spacing={2} style={{ marginBottom: 15 }}>
                 <Grid item lg={6}>
                     <BarStats title="Total Goals Over" data={overUnderData.OVER}></BarStats>
