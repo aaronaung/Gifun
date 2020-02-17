@@ -20,7 +20,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt'
 import Search from '@material-ui/icons/Search'
 import ViewColumn from '@material-ui/icons/ViewColumn'
 import { FormControl, Select, MenuItem, InputLabel, Typography, Grid, Tabs, Tab, Box, TextField } from '@material-ui/core'
-import betFameData from './betfame/data'
+import betFameData from './betfame/betfame-data-1581907474020'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts'
 import { Autocomplete } from '@material-ui/lab'
@@ -85,8 +85,8 @@ function BarStats({ data, title }) {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="total" fill="#8884d8" />
-                    <Bar dataKey="wins" fill="#82ca9d" />
+                    <Bar stackId="x" dataKey="losses" fill="#d44249" />
+                    <Bar stackId="x" dataKey="wins" fill="#82ca9d" />
                 </BarChart>
             )
         }
@@ -114,8 +114,11 @@ function TipstersStats({ stats, tabIndex }) {
     const getTableData = (tipster, type) => {
         let data = null
         let result = null
-        if (type === 'overUnder') {
-            data = stats.overUnderStats[tipster]
+        if (type === 'overUnderFull') {
+            data = stats.overUnderStats[tipster] && stats.overUnderStats[tipster]['fulltime']
+            result = { OVER: [], UNDER: [] }
+        } else if (type === 'overUnderHalf') {
+            data = stats.overUnderStats[tipster] && stats.overUnderStats[tipster]['halftime']
             result = { OVER: [], UNDER: [] }
         } else if (type === 'asianHandicap') {
             data = stats.asianHandicapStats[tipster]
@@ -125,7 +128,11 @@ function TipstersStats({ stats, tabIndex }) {
         }
         for (let tipType in data) {
             for (let tipGoal in data[tipType]) {
-                let r = { name: tipGoal, total: data[tipType][tipGoal].count, wins: data[tipType][tipGoal].wins }
+                let r = {
+                    name: tipGoal,
+                    losses: data[tipType][tipGoal].count - data[tipType][tipGoal].wins,
+                    wins: data[tipType][tipGoal].wins,
+                }
                 result[tipType].push(r)
             }
         }
@@ -133,7 +140,10 @@ function TipstersStats({ stats, tabIndex }) {
     }
     const classes = useStyles()
     const tipsters = Object.keys(stats.asianHandicapStats)
-    const initialOverUnderData = getTableData(tipsters[0], 'overUnder')
+    const initialOverUnderData = {
+        fulltime: getTableData(tipsters[0], 'overUnderFull'),
+        halftime: getTableData(tipsters[0], 'overUnderHalf'),
+    }
     const initialAsianHandicapData = getTableData(tipsters[0], 'asianHandicap')
 
     const [currentTipster, setCurrentTipster] = React.useState(tipsters[0])
@@ -142,7 +152,10 @@ function TipstersStats({ stats, tabIndex }) {
 
     const handleSelectChange = e => {
         setCurrentTipster(e.target.value)
-        let overUnderData = getTableData(e.target.value, 'overUnder')
+        let overUnderData = {
+            fulltime: getTableData(e.target.value, 'overUnderFull'),
+            halftime: getTableData(e.target.value, 'overUnderHalf'),
+        }
         let asianHandicapData = getTableData(e.target.value, 'asianHandicap')
         setOverUnderData(overUnderData)
         setAsianHandicapData(asianHandicapData)
@@ -163,18 +176,26 @@ function TipstersStats({ stats, tabIndex }) {
             </div>
             <Grid container spacing={2} style={{ marginBottom: 15 }}>
                 <Grid item md={12} lg={6}>
-                    <BarStats title="Total Goals Over" data={overUnderData.OVER}></BarStats>
+                    <BarStats title="Total Goals Fulltime Over" data={overUnderData['fulltime'].OVER}></BarStats>
                 </Grid>
                 <Grid item md={12} lg={6}>
-                    <BarStats title="Total Goals Under" data={overUnderData.UNDER}></BarStats>
+                    <BarStats title="Total Goals Fulltime Under" data={overUnderData['fulltime'].UNDER}></BarStats>
                 </Grid>
             </Grid>
             <Grid container spacing={2} style={{ marginBottom: 15 }}>
                 <Grid item md={12} lg={6}>
-                    <BarStats title="Asian Handicap Full" data={asianHandicapData.full}></BarStats>
+                    <BarStats title="Total Goals Halftime Over" data={overUnderData['halftime'].OVER}></BarStats>
                 </Grid>
                 <Grid item md={12} lg={6}>
-                    <BarStats title="Asian Handicap Half" data={asianHandicapData.half}></BarStats>
+                    <BarStats title="Total Goals Halftime Under" data={overUnderData['halftime'].UNDER}></BarStats>
+                </Grid>
+            </Grid>
+            <Grid container spacing={2} style={{ marginBottom: 15 }}>
+                <Grid item md={12} lg={6}>
+                    <BarStats title="Asian Handicap Fulltime" data={asianHandicapData.full}></BarStats>
+                </Grid>
+                <Grid item md={12} lg={6}>
+                    <BarStats title="Asian Handicap Halftime" data={asianHandicapData.half}></BarStats>
                 </Grid>
             </Grid>
         </>
