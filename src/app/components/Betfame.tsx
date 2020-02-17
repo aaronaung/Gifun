@@ -21,6 +21,7 @@ import Search from '@material-ui/icons/Search'
 import ViewColumn from '@material-ui/icons/ViewColumn'
 import { FormControl, Select, MenuItem, InputLabel, Typography, Grid, Tabs, Tab, Box, TextField } from '@material-ui/core'
 import betFameData from './betfame/betfame-data-1581907474020'
+import { getWinRatesData } from './betfame/winrates'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts'
 import { Autocomplete } from '@material-ui/lab'
@@ -55,6 +56,72 @@ interface Row {
 interface TableState {
     columns: Array<Column<Row>>
     data: Row[]
+}
+
+function WinRateTables() {
+    const [state, setState] = React.useState<TableState>({
+        columns: [
+            { title: 'Tipster', field: 'tipster' },
+            { title: 'Win Rate', field: 'winRate', defaultSort: 'desc' },
+            { title: 'Total Tips', field: 'totalTips', type: 'numeric' },
+        ],
+    })
+    const classes = useStyles()
+    const nameMap = {
+        'asianHandicapStats-full': 'Asian Handicap Full Time',
+        'asianHandicapStats-half': 'Asian Handicap Half Time',
+        'overUnderStats-fulltime-OVER': 'Total Goals Full Time Over',
+        'overUnderStats-fulltime-UNDER': 'Total Goals Full Time Under',
+        'overUnderStats-halftime-OVER': 'Total Goals Half Time Over',
+        'overUnderStats-halftime-UNDER': 'Total Goals Half Time Under',
+    }
+    const [selectState, setSelectState] = React.useState('Premiums')
+    const winRateData = getWinRatesData(betFameData)
+    const getTables = () => {
+        return Object.keys(winRateData[selectState.toLowerCase()]).map(gameType => {
+            return (
+                <Grid item md={4} lg={4}>
+                    <MaterialTable
+                        style={{ marginBottom: 20 }}
+                        icons={tableIcons}
+                        title={<Typography variant="caption">{nameMap[gameType]}</Typography>}
+                        options={{ pageSize: 5 }}
+                        columns={state.columns}
+                        data={winRateData[selectState.toLowerCase()][gameType]}
+                    /> 
+                </Grid>
+            )
+        })
+    }
+    const handleSelectChange = e => {
+        setSelectState(e.target.value)
+    }
+    return (
+        <>
+            <FormControl variant="outlined" className={classes.formControl} style={{ marginBottom: 20 }}>
+                <Select native value={selectState} onChange={handleSelectChange}>
+                    <option value={'premiums'}>Premiums</option>
+                    <option value={'seniors'}>Seniors</option>
+                </Select>
+            </FormControl>
+            <div>
+                <Grid container spacing={2} style={{ marginBottom: 15 }}>
+                    {getTables().map((tbl, i) => {
+                        if (i < 3) {
+                            return tbl
+                        }
+                    })}
+                </Grid>
+                <Grid container spacing={2} style={{ marginBottom: 15 }}>
+                    {getTables().map((tbl, i) => {
+                        if (i >= 3) {
+                            return tbl
+                        }
+                    })}
+                </Grid>
+            </div>
+        </>
+    )
 }
 
 function BarStats({ data, title }) {
@@ -280,17 +347,21 @@ export default function Betfame() {
                 aria-label="full width tabs example"
                 style={{ marginBottom: 15 }}
             >
-                <Tab label="Seniors" {...a11yProps(0)} />
-                <Tab label="Premiums" {...a11yProps(1)} />
-                <Tab label="Overall Stats" {...a11yProps(2)} />
+                <Tab label="Winrates by Game Type" {...a11yProps(0)} />
+                <Tab label="Seniors" {...a11yProps(1)} />
+                <Tab label="Premiums" {...a11yProps(2)} />
+                <Tab label="Overall Stats" {...a11yProps(3)} />
             </Tabs>
             <TabPanel value={tabValue} index={0}>
-                <TipstersStats stats={betFameData.seniors} tabIndex={0}></TipstersStats>
+                <WinRateTables></WinRateTables>
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                <TipstersStats stats={betFameData.premiums} tabIndex={1}></TipstersStats>
+                <TipstersStats stats={betFameData.seniors} tabIndex={1}></TipstersStats>
             </TabPanel>
             <TabPanel value={tabValue} index={2}>
+                <TipstersStats stats={betFameData.premiums} tabIndex={2}></TipstersStats>
+            </TabPanel>
+            <TabPanel value={tabValue} index={3}>
                 <MaterialTable
                     style={{ marginBottom: 20 }}
                     icons={tableIcons}
