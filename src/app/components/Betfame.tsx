@@ -59,6 +59,11 @@ interface TableState {
 
 function BarStats({ data, title }) {
     data = data.sort((a, b) => a.name - b.name)
+    const totalWins = data.length > 0 ? data.map(d => d.wins).reduce((a, b) => a + b) : 0
+    const totalLosses = data.length > 0 ? data.map(d => d.losses).reduce((a, b) => a + b) : 0
+    const winRate = ((totalWins * 100) / (totalWins + totalLosses)).toFixed(2)
+    const totalTips = totalWins + totalLosses
+
     const renderStats = () => {
         if (data.length === 0) {
             return (
@@ -93,9 +98,17 @@ function BarStats({ data, title }) {
     }
     return (
         <>
-            <Typography variant="h6" style={{ marginBottom: 20 }}>
-                {title}
-            </Typography>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="h6" style={{ marginBottom: 20 }}>
+                    {title}
+                </Typography>
+                <Typography variant="subtitle2" style={{ marginBottom: 20, marginLeft: 20 }}>
+                    Win Rate: {winRate}%
+                </Typography>
+                <Typography variant="subtitle2" style={{ marginBottom: 20, marginLeft: 20 }}>
+                    Total Tip: {totalTips}
+                </Typography>
+            </div>
             {renderStats()}
         </>
     )
