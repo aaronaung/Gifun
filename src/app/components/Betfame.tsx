@@ -20,7 +20,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt'
 import Search from '@material-ui/icons/Search'
 import ViewColumn from '@material-ui/icons/ViewColumn'
 import { FormControl, Select, MenuItem, InputLabel, Typography, Grid, Tabs, Tab, Box, TextField } from '@material-ui/core'
-import betFameData from './betfame/betfame-data-1581907474020'
+import betFameData from './betfame/betfame-data-1581982143113'
 import { getWinRatesData } from './betfame/winrates'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts'
@@ -74,9 +74,12 @@ function WinRateTables() {
         'overUnderStats-fulltime-UNDER': 'Total Goals Full Time Under',
         'overUnderStats-halftime-OVER': 'Total Goals Half Time Over',
         'overUnderStats-halftime-UNDER': 'Total Goals Half Time Under',
+        'fixedOddStats-full': 'Fixed Odd Full Time',
+        'fixedOddStats-half': 'Fixed Odd Half Time',
     }
     const [selectState, setSelectState] = React.useState('Premiums')
     const winRateData = getWinRatesData(betFameData)
+    console.log(winRateData)
     const getTables = () => {
         return Object.keys(winRateData[selectState.toLowerCase()]).map(gameType => {
             return (
@@ -88,7 +91,7 @@ function WinRateTables() {
                         options={{ pageSize: 5 }}
                         columns={state.columns}
                         data={winRateData[selectState.toLowerCase()][gameType]}
-                    /> 
+                    />
                 </Grid>
             )
         })
@@ -106,19 +109,20 @@ function WinRateTables() {
             </FormControl>
             <div>
                 <Grid container spacing={2} style={{ marginBottom: 15 }}>
-                    {getTables().map((tbl, i) => {
+                    {getTables()}
+                    {/* {getTables().map((tbl, i) => {
                         if (i < 3) {
                             return tbl
                         }
-                    })}
+                    })} */}
                 </Grid>
-                <Grid container spacing={2} style={{ marginBottom: 15 }}>
+                {/* <Grid container spacing={2} style={{ marginBottom: 15 }}>
                     {getTables().map((tbl, i) => {
                         if (i >= 3) {
                             return tbl
                         }
                     })}
-                </Grid>
+                </Grid> */}
             </div>
         </>
     )
@@ -186,6 +190,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         '& .MuiInputBase-root': {
             width: 300,
             marginBottom: 20,
+        },
+        '& .MuiInputLabel-root': {
+            backgroundColor: 'white',
         },
     },
 }))

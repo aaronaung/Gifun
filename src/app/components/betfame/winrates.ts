@@ -10,6 +10,8 @@ export const getWinRatesData = data => {
             'overUnderStats-fulltime-UNDER': [],
             'overUnderStats-halftime-OVER': [],
             'overUnderStats-halftime-UNDER': [],
+            'fixedOddStats-full': [],
+            'fixedOddStats-half': [],
         },
         premiums: {
             'asianHandicapStats-full': [],
@@ -18,6 +20,8 @@ export const getWinRatesData = data => {
             'overUnderStats-fulltime-UNDER': [],
             'overUnderStats-halftime-OVER': [],
             'overUnderStats-halftime-UNDER': [],
+            'fixedOddStats-full': [],
+            'fixedOddStats-half': [],
         },
     }
     for (let tipsterGroup in data) {
@@ -32,7 +36,7 @@ export const getWinRatesData = data => {
                 result[tipsterGroup][`asianHandicapStats-${type}`].push({
                     tipster,
                     winRate: `${isNaN((totalWins * 100) / totalTips) ? 0 : ((totalWins * 100) / totalTips).toFixed(2)}%`,
-                    totalTips,
+                    totalTips: totalTips || 0,
                 })
             }
         }
@@ -49,9 +53,21 @@ export const getWinRatesData = data => {
                     result[tipsterGroup][`overUnderStats-${type}-${type2}`].push({
                         tipster,
                         winRate: `${isNaN((totalWins * 100) / totalTips) ? 0 : ((totalWins * 100) / totalTips).toFixed(2)}%`,
-                        totalTips,
+                        totalTips: totalTips || 0,
                     })
                 }
+            }
+        }
+
+        for (let tipster in copy[tipsterGroup].fixedOddStats) {
+            for (let type in copy[tipsterGroup].fixedOddStats[tipster]) {
+                let totalTips = copy[tipsterGroup].fixedOddStats[tipster][type].count
+                let totalWins = copy[tipsterGroup].fixedOddStats[tipster][type].wins
+                result[tipsterGroup][`fixedOddStats-${type}`].push({
+                    tipster,
+                    winRate: `${isNaN((totalWins * 100) / totalTips) ? 0 : ((totalWins * 100) / totalTips).toFixed(2)}%`,
+                    totalTips: totalTips || 0,
+                })
             }
         }
     }
