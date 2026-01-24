@@ -30,7 +30,7 @@
         "gatsby-transformer-sharp": "^2.1.8",
         "gif.js": "^0.2.0",
         "gifshot": "^0.4.5",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.23",
         "material-table": "^1.57.2",
         "radiks": "^0.2.2-beta.1",
         "react": "^16.7.0",
